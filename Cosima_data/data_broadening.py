@@ -2,15 +2,19 @@
 
 
 """
-Created on Fri Jun 26 11:31:42 2015
+Created: Fri Jun 26 11:31:42 2015
 
-@author: morgan
+Author: Morgan A. Daly
 """
 
 """
 STEP ONE
     change to electron equivalent energy
-
+STEP TWO
+    weighted averages
+    ## def mean(a, axis=None, dtype=None, out=None, keepdims=False) ##
+STEP THREE
+    broadening
 
 Position
     D1xy

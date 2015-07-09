@@ -1,0 +1,35 @@
+INTERACTION KEY
+    1: interaction type
+    2: ID of this interaction
+    3: ID of interaction this particle originated from
+    4: Detector ID
+        4: scintillator (here, anticoincidence domes)
+        7: anger camera (here, D1/D2 scintillators)
+    5: Time since start of event in seconds
+    6: x position of interaction in cm
+    7: y position of interaction in cm
+    8: z position of interaction in cm
+    9: ID of original particle
+        1: gamma
+        2: positron
+        3: electron
+        4: proton
+        6: neutron
+        18: deuteron
+        20: He-3
+        21: alpha
+    10: new x direction of original particle
+    11: new y direction of original particle
+    12: new z direction of original particle
+    13: new x polarization of original particle
+    14: new y polarization of original particle
+    15: new z polartization of original particle
+    16: new kinetic energy of original particle in keV
+    17: ID of new particle
+    18: x direction of new particle
+    19: y direction of new particle
+    20: z direction of new particle
+    21: x polarization of new particle
+    22: y polarization of new particle
+    23: z polarization of new particle
+    24: kinetic energy of new particle in keV
