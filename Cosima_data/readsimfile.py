@@ -3,7 +3,7 @@
 Created: Tue Jul  7 13:08:07 2015
 
 Author: Morgan A. Daly
-@todo this is probably a good place to create classes
+@todo maybe put data into classes?? will reassess
 
 
 This module contains functions to parse the text file output from Cosima,

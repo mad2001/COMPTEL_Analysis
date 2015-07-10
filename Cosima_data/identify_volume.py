@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Jul  6 14:52:13 2015
 
-@author: morgan
+"""
+Created: Mon Jul  6 14:52:13 2015
+Author: Morgan A. Daly
 
 This is painfully brute forced I'm sorry @everyone
 """
 import numpy as np
 
-
+from defining_volumes import *
 
 
 
