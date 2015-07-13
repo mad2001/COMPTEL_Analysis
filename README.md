@@ -25,7 +25,8 @@ General process is as follows:
     Gaussian distribution
 6) Identifies the hits that would have triggered COMPTEL
 
-
+* note that unless explicitly stated otherwise units should be assumed
+    to be centimeters (cm) and kilo electron volts (keV).
 
 
 
@@ -64,6 +65,10 @@ GEOMEGA
     M1: height (full not half) M2: inner radius M3: outer radius
 
 
+
+These are measurements that correspond with those used in the construction
+of geometry for MEGAlib simulations.
+They may vary slightly from actual COMPTEL measurements.
 
 GEOMETRY FILE NOTES:
     SurroundingSphere 250.0 0.0 0.0 0.0 250.0

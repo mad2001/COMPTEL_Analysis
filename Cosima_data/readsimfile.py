@@ -15,20 +15,21 @@ Important data is organized into a ndarray to allow for further analysis.
 dtype: ndarray
 row: one per interaction
 columns:
-    1 event ID
-    2 number of incident particles
-    3 event's start time
-    4 interaction ID
-    5 time since start of event in seconds
-    6 x position of interaction in cm
-    7 y position of interaction in cm
-    8 z position of interaction in cm
-    9 ID of original particle
+    0 event ID
+    1 number of incident particles
+    2 event's start time
+    3 interaction ID
+    4 interaction of origin ID
+    5 detector ID
+    6 time since start
+    7 x position of interaction in cm
+    8 y position of interaction in cm
+    9 z position of interaction in cm
+    10 ID of original particle
         (key: 1 gamma, 2 positron, 3 electron, 4 proton, 6 neutron
         18 deuteron, 20 He-3, 21 alpha)
-    16 new kinetic energy of original particle in keV
-    17 ID of new particle
-    24 kinetic energy of new particle in keV
+    11 ID of new particle
+    12 kinetic energy of new particle in keV
 
 
 Current wall time: 7.4 s
@@ -195,6 +196,23 @@ def make_outputarray(all_events):
                 (sim_data, make_eventarray(single_event)))
 
     return sim_data
+
+
+class Interaction:
+    def __init__(self, data_array):
+        self.event_id = data_array[:, 0]
+        self.incidents = data_array[:, 1]
+        self.start_time = data_array[:,2]
+        self.interaction_id= data_array[:, 3]
+        self.origin_interactionid = data_array[:, 4]
+        self.detector_id = data_array[:, 5]
+        self.elapsed_time = data_array[:, 6]
+        self.position = data_array[:, 7:9]
+        self.origin_particleid = data_array[:, 10]
+        self.new_particleid = data_array[:, 11]
+        self.energy = data_array[:, 12]
+
+
 
 
 def main():
