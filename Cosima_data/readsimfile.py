@@ -191,36 +191,26 @@ def make_outputarray(all_events):
     """
 
     sim_data = make_eventarray(all_events[0])
+    labels={'names':['event_id', 'incidents', 'start_time', 'interaction_id',
+                 'origin_interactionid', 'detector_id', 'elapsed_time', 'x',
+                 'y', 'z', 'origin_particleid', 'new_particleid', 'energy'],
+                 'formats':['i4', 'i4', 'f4', 'i4', 'i4', 'f4', 'f4', 'f4',
+                 'f4', 'f4', 'i4', 'i4', 'f4']}
     for i, single_event in enumerate(all_events, 1):
         sim_data = np.concatenate(
                 (sim_data, make_eventarray(single_event)))
 
-    return sim_data
-
-
-class Interaction:
-    def __init__(self, data_array):
-        self.event_id = data_array[:, 0]
-        self.incidents = data_array[:, 1]
-        self.start_time = data_array[:,2]
-        self.interaction_id= data_array[:, 3]
-        self.origin_interactionid = data_array[:, 4]
-        self.detector_id = data_array[:, 5]
-        self.elapsed_time = data_array[:, 6]
-        self.position = data_array[:, 7:9]
-        self.origin_particleid = data_array[:, 10]
-        self.new_particleid = data_array[:, 11]
-        self.energy = data_array[:, 12]
-
+    dtype=[('event_id', '<i4'), ('incidents', '<i4'), ('start_time', '<f4'),
+           ('interaction_id', '<i4'), ('origin_interactionid', '<i4'),
+            ('detector_id', '<f4'), ('elapsed_time', '<f4'), ('x', '<f4'),
+            ('y', '<f4'), ('z', '<f4'), ('origin_particleid', '<i4'),
+            ('new_particleid', '<i4'), ('energy', '<f4')]
+    return np.copy(sim_data)
 
 
 
 def main():
-
     compile_regex()
     all_events = parse_simfile(filename)
 
     return make_outputarray(all_events)
-
-
-main()
