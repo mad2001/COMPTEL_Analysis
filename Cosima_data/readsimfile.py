@@ -39,10 +39,7 @@ Current wall time: 7.4 s
 
 import re
 import numpy as np
-
-# this will need to be fixed at some point
-#       would like to create module to input a directory
-filename = "TAKE3o18_1MeV.inc2.id1.sim"
+import pandas as pd
 
 
 def compile_regex():
@@ -191,26 +188,26 @@ def make_outputarray(all_events):
     """
 
     sim_data = make_eventarray(all_events[0])
-    labels={'names':['event_id', 'incidents', 'start_time', 'interaction_id',
-                 'origin_interactionid', 'detector_id', 'elapsed_time', 'x',
-                 'y', 'z', 'origin_particleid', 'new_particleid', 'energy'],
-                 'formats':['i4', 'i4', 'f4', 'i4', 'i4', 'f4', 'f4', 'f4',
-                 'f4', 'f4', 'i4', 'i4', 'f4']}
+
     for i, single_event in enumerate(all_events, 1):
         sim_data = np.concatenate(
                 (sim_data, make_eventarray(single_event)))
 
-    dtype=[('event_id', '<i4'), ('incidents', '<i4'), ('start_time', '<f4'),
-           ('interaction_id', '<i4'), ('origin_interactionid', '<i4'),
-            ('detector_id', '<f4'), ('elapsed_time', '<f4'), ('x', '<f4'),
-            ('y', '<f4'), ('z', '<f4'), ('origin_particleid', '<i4'),
-            ('new_particleid', '<i4'), ('energy', '<f4')]
-    return np.copy(sim_data)
+
+    return pd.DataFrame(sim_data,
+                        columns=['EventID', 'Incidents', 'StartTime',
+                        'InteractionID', 'OriginInteractionID',
+                        'DetectorID', 'ElapsedTime', 'x', 'y', 'z',
+                        'OriginalParticleID', 'NewParticleID', 'Energy'])
 
 
+def return_simdata(filename):
 
-def main():
     compile_regex()
+
     all_events = parse_simfile(filename)
 
     return make_outputarray(all_events)
+
+
+

@@ -55,9 +55,9 @@ class Volume(object):
 
     """
 
-    id = 0
+    id = 1
 
-    def __init__(self, position, mother=None, module_id=0):
+    def __init__(self, position, mother=None):
         self.mother = mother
 #        while mother is not None:
 #            position = np.add(position, mother.position)
@@ -69,8 +69,6 @@ class Volume(object):
         self.x = self.position[0]
         self.y = self.position[1]
         self.z = self.position[2]
-        self.module_id = module_id
-        self.id = self.id + module_id*.1
 
 
 
@@ -146,12 +144,12 @@ class D1(Volume):
 
     """
 
-    id = 7
     radius = 14.56
     half_height = 4.25
 
     def __init__(self, position, mother=None, module_id=0):
-        Volume.__init__(self, position, mother, module_id)
+        self.id = 1 + module_id * .1
+        Volume.__init__(self, position, mother)
 
 
     def check_point(self, point_position):
@@ -201,12 +199,12 @@ class D2(Volume):
 
     """
 
-    id = 7
     radius = 14.085
     half_height = 3.7625
 
     def __init__(self, position, mother=None, module_id=0):
-        Volume.__init__(self, position, mother, module_id)
+        self.id = 2 + module_id * .1
+        Volume.__init__(self, position, mother)
 
     def check_point(self, point_position):
         #@todo fix this (see D1)
@@ -292,7 +290,7 @@ class VetoDome2(Volume):
     def __init__(self, mother=None):
         self.mother = mother
 
-    def check_points(self, point_position):
+    def check_point(self, point_position):
         x, y, z = point_position
         # if outside z range of dome return false
         if 80 < z < 25:
@@ -379,30 +377,31 @@ SETU = Virtual((0, 0, -117.4))
 
 DET1 = Virtual((0, 0, 209.45), SETU)
 
-D1_module1 = D1((0, 0, 10.3), DET1)
-D1_module2 = D1((-42.3, 0, 10.3), DET1)
-D1_module3 = D1((-26, 39.1, 10.3), DET1)
-D1_module4 = D1((26, 39.1, 10.3), DET1)
-D1_module5 = D1((42.3, 0, 10.3), DET1)
-D1_module6 = D1((26, -39.1, 10.3), DET1)
-D1_module7 = D1((-26, -39.1, 10.3), DET1)
+D1_module1 = D1((0, 0, 10.3), DET1, 1)
+D1_module2 = D1((-42.3, 0, 10.3), DET1, 2)
+D1_module3 = D1((-26, 39.1, 10.3), DET1, 3)
+D1_module4 = D1((26, 39.1, 10.3), DET1, 4)
+D1_module5 = D1((42.3, 0, 10.3), DET1, 5)
+D1_module6 = D1((26, -39.1, 10.3), DET1, 6)
+D1_module7 = D1((-26, -39.1, 10.3), DET1, 7)
 
 DET2 = Virtual((0, 0, 52.1), SETU)
 D2shift = Virtual((0, 0, 14.3375), DET2)
 
-D2_module1 = D2((30.2, -41.254, -4.6875), D2shift)
-D2_module2 = D2((0, -41.254, -4.6875), D2shift)
-D2_module3 = D2((45.3, -15.1, -4.6875), D2shift)
-D2_module4 = D2((15.1, -15.1, -4.6875), D2shift)
-D2_module5 = D2((-15.1, -15.1, -4.6875), D2shift)
-D2_module6 = D2((-45.3, -15.1, -4.6875), D2shift)
-D2_module7 = D2((45.3, 15.1, -4.6875), D2shift)
-D2_module8 = D2((15.1, 15.1, -4.6875), D2shift)
-D2_module9 = D2((-15.1, 15.1, -4.6875), D2shift)
-D2_module10 = D2((-45.3, 15.1, -4.6875), D2shift)
-D2_module11 = D2((30.2, 41.254, -4.6875), D2shift)
-D2_module12 = D2((0, 41.254, -4.6875), D2shift)
-D2_module13 = D2((-30.2, 41.254, -4.6875), D2shift)
+D2_module1 = D2((30.2, -41.254, -4.6875), D2shift, 1)
+D2_module2 = D2((0, -41.254, -4.6875), D2shift, 2)
+D2_module3 = D2((-30.2 -41.254 -4.6875), D2shift, 3)
+D2_module4 = D2((45.3, -15.1, -4.6875), D2shift, 4)
+D2_module5 = D2((15.1, -15.1, -4.6875), D2shift, 5)
+D2_module6 = D2((-15.1, -15.1, -4.6875), D2shift, 6)
+D2_module7 = D2((-45.3, -15.1, -4.6875), D2shift, 7)
+D2_module8 = D2((45.3, 15.1, -4.6875), D2shift, 8)
+D2_module9 = D2((15.1, 15.1, -4.6875), D2shift, 9)
+D2_module10 = D2((-15.1, 15.1, -4.6875), D2shift, 10)
+D2_module11 = D2((-45.3, 15.1, -4.6875), D2shift, 11)
+D2_module12 = D2((30.2, 41.254, -4.6875), D2shift, 12)
+D2_module13 = D2((0, 41.254, -4.6875), D2shift, 13)
+D2_module14 = D2((-30.2, 41.254, -4.6875), D2shift, 14)
 
 VD1 = VetoDome1(SETU)
 VD2 = VetoDome2(SETU)
@@ -412,10 +411,14 @@ VD4 = VetoDome4(SETU)
 
 
 
-def identify_COMPTELmodule(interaction):
-    position = 7
-    if detectorid == 4:
-        if z > 5:
+def identify_COMPTELmodule(sim_data):
+    """
+    input is one row of data frame
+    """
+    position = (sim_data['x'], sim_data['y'], sim_data['z'])
+
+    if sim_data['DetectorID'] == 4:
+        if sim_data['z'] > 5:
             if D1_module1.check_point(position): return D1_module1.id
             elif D1_module2.check_point(position): return D1_module2.id
             elif D1_module3.check_point(position): return D1_module3.id
@@ -423,7 +426,7 @@ def identify_COMPTELmodule(interaction):
             elif D1_module5.check_point(position): return D1_module5.id
             elif D1_module6.check_point(position): return D1_module6.id
             elif D1_module7.check_point(position): return D1_module7.id
-        elif z < 5:
+        elif sim_data['z'] < 5:
             if D2_module1.check_point(position): return D2_module1.id
             elif D2_module2.check_point(position): return D2_module2.id
             elif D2_module3.check_point(position): return D2_module3.id
@@ -438,14 +441,17 @@ def identify_COMPTELmodule(interaction):
             elif D2_module12.check_point(position): return D2_module12.id
             elif D2_module13.check_point(position): return D2_module13.id
             elif D2_module14.check_point(position): return D2_module14.id
-    elif detectorid == 7:
-        if z > 5:
+    elif sim_data['DetectorID'] == 7:
+        if sim_data['z'] > 5:
             if VD1.check_point(position): return VD1.id
             elif VD2.check_point(position): return VD2.id
-        elif z < 5:
+        elif sim_data['z'] < 5:
             if VD3.check_point(position): return VD3.id
             elif VD4.check_point(position): return VD4.id
+    elif sim_data['DetectorID'] == 0:
+         return 0
     else:
         print("wut")
+        return 99999
 
 

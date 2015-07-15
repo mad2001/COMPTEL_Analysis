@@ -6,22 +6,22 @@ Author: Morgan A. Daly
 """
 
 import numpy as np
+import pandas as pd
 import readsimfile as rd
-from defining_volumes import identify_COMPTELmodule
+from defining_volumes import *
 
-def main():
 
-    # convert *.sim file to ndarray of data
-    simulation = rd.main()
-    sim = rd.Interaction(simulation)
+filename = "COMPTELeffA_22MeV.inc1.id1.sim"
+
+def main(filename):
+
+    # convert *.sim file to data frame
+    sim_data = rd.return_simdata(filename)
+
     # change detector ID to format that identifies detector and module
-    for i, interaction in np.ndenumerate(sim):
-        sim.detector_id[i] = identify_COMPTELmodule(
-                (sim.position[i]), sim.detector_id[i])
+    sim_data['DetectorID'] = sim_data.apply(identify_COMPTELmodule, axis=1)
 
-     convert to electron equivalent
-
-sim = rd.main()
+    return sim_data
+#     convert to electron equivalent
 
 
-new = np.array(sim, dtype=labels)
