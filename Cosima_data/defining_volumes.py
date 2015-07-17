@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Created Summer 2015
+Created: Summer 2015
 Author: Morgan A. Daly
 
 
@@ -59,9 +59,6 @@ class Volume(object):
 
     def __init__(self, position, mother=None):
         self.mother = mother
-#        while mother is not None:
-#            position = np.add(position, mother.position)
-#            mother = mother.mother
         if mother is not None:
             self.position = np.add(position, mother.position)
         else:
@@ -148,12 +145,11 @@ class D1(Volume):
     half_height = 4.25
 
     def __init__(self, position, mother=None, module_id=0):
-        self.id = 1 + module_id * .1
+        self.id = module_id
         Volume.__init__(self, position, mother)
 
 
     def check_point(self, point_position):
-        #@todo adjust based on what actual input will be
         x, y, z = point_position
         if z < (self.z - self.half_height) or z > (self.z + self.half_height):
             return False
@@ -164,7 +160,7 @@ class D1(Volume):
         elif ((x - self.x)**2 + (y - self.y)**2) < (self.radius**2):
             return True
         else:
-            print("What did you doo...?")
+            return False
 
 
 class D2(Volume):
@@ -199,26 +195,30 @@ class D2(Volume):
 
     """
 
-    radius = 14.085
+    radius = 15.085
     half_height = 3.7625
 
     def __init__(self, position, mother=None, module_id=0):
-        self.id = 2 + module_id * .1
+        self.id = module_id
         Volume.__init__(self, position, mother)
 
     def check_point(self, point_position):
-        #@todo fix this (see D1)
         x, y, z = point_position
-        if z < (self.z - self.half_height) or z > (self.z + self.half_height):
-            return False
-        if abs(x - self.x) > self.radius:
-            return False
-        if abs(y - self.y) > self.radius:
-            return False
-        if ((x - self.x)**2 + (y - self.y)**2) < (self.radius**2):
+#        if z < (self.z - self.half_height) or z > (self.z + self.half_height):
+#            print('part1')
+#            return False
+#        if abs(x) > (self.radius + abs(self.x)):
+#            print('part2')
+#            return False
+#        elif abs(y)  > (self.radius + abs(self.y)):
+#            print('part3')
+#            return False
+        if (((x - self.x)**2 + (y - self.y)**2)) < (self.radius**2):
             return True
+            print('nice')
         else:
-            print("What did you doo...?")
+            return False
+            print('the end')
 
 # XXX I literally have no idea if any of this works
 #   Veto dome method is definitely only guarunteed if inputting only
@@ -267,10 +267,10 @@ class VetoDome1(Volume):
         if 140 < z < 35:
             return False
         # if in z range where there is no veto dome overlap return true
-        elif z < 80:
+        elif z > 77:
             return True
         # if in z range where there is overlap but is in x, y range retrun true
-        elif 75.5 < np.sqrt(x**2 + y**2) < 77.2:
+        elif 73 < np.sqrt(x**2 + y**2) < 80:
             return True
         else:
             return False
@@ -299,7 +299,7 @@ class VetoDome2(Volume):
         elif z < 50:
             return True
         # if in z range where there is overlap but is in x, y range return true
-        elif 68 < np.sqrt(x**2 + y**2) < 69.6:
+        elif 64 < np.sqrt(x**2 + y**2) < 72:
             return True
         else:
             return False
@@ -323,13 +323,13 @@ class VetoDome3(Volume):
     def check_point(self, point_position):
         x, y, z = point_position
         # if outside z range of dome return false
-        if 2 < z < -86:
+        if 2 < z < -88:
             return False
         # if in z range where there is no veto dome overlap return true
         elif z > -62:
             return True
         # if in z range where there is overlap but is in x, y range retrun true
-        elif 76 < np.sqrt(x**2 + y**2) < 77.7:
+        elif 72 < np.sqrt(x**2 + y**2) < 82:
             return True
         else:
             return False
@@ -359,7 +359,7 @@ class VetoDome4(Volume):
         elif z < -86:
             return True
         # if in z range where there is overlap but is in x, y range return true
-        elif 68 < np.sqrt(x**2 + y**2) < 69.6:
+        elif 64 < np.sqrt(x**2 + y**2) < 72:
             return True
         else:
             return False
@@ -377,31 +377,31 @@ SETU = Virtual((0, 0, -117.4))
 
 DET1 = Virtual((0, 0, 209.45), SETU)
 
-D1_module1 = D1((0, 0, 10.3), DET1, 1)
-D1_module2 = D1((-42.3, 0, 10.3), DET1, 2)
-D1_module3 = D1((-26, 39.1, 10.3), DET1, 3)
-D1_module4 = D1((26, 39.1, 10.3), DET1, 4)
-D1_module5 = D1((42.3, 0, 10.3), DET1, 5)
-D1_module6 = D1((26, -39.1, 10.3), DET1, 6)
-D1_module7 = D1((-26, -39.1, 10.3), DET1, 7)
+D1_module1 = D1((0, 0, 10.3), DET1, 1.01)
+D1_module2 = D1((-42.3, 0, 10.3), DET1, 1.02)
+D1_module3 = D1((-26, 39.1, 10.3), DET1, 1.03)
+D1_module4 = D1((26, 39.1, 10.3), DET1, 1.04)
+D1_module5 = D1((42.3, 0, 10.3), DET1, 1.05)
+D1_module6 = D1((26, -39.1, 10.3), DET1, 1.06)
+D1_module7 = D1((-26, -39.1, 10.3), DET1, 1.07)
 
 DET2 = Virtual((0, 0, 52.1), SETU)
 D2shift = Virtual((0, 0, 14.3375), DET2)
 
-D2_module1 = D2((30.2, -41.254, -4.6875), D2shift, 1)
-D2_module2 = D2((0, -41.254, -4.6875), D2shift, 2)
-D2_module3 = D2((-30.2 -41.254 -4.6875), D2shift, 3)
-D2_module4 = D2((45.3, -15.1, -4.6875), D2shift, 4)
-D2_module5 = D2((15.1, -15.1, -4.6875), D2shift, 5)
-D2_module6 = D2((-15.1, -15.1, -4.6875), D2shift, 6)
-D2_module7 = D2((-45.3, -15.1, -4.6875), D2shift, 7)
-D2_module8 = D2((45.3, 15.1, -4.6875), D2shift, 8)
-D2_module9 = D2((15.1, 15.1, -4.6875), D2shift, 9)
-D2_module10 = D2((-15.1, 15.1, -4.6875), D2shift, 10)
-D2_module11 = D2((-45.3, 15.1, -4.6875), D2shift, 11)
-D2_module12 = D2((30.2, 41.254, -4.6875), D2shift, 12)
-D2_module13 = D2((0, 41.254, -4.6875), D2shift, 13)
-D2_module14 = D2((-30.2, 41.254, -4.6875), D2shift, 14)
+D2_module1 = D2((30.2, -41.254, -4.6875), D2shift, 2.01)
+D2_module2 = D2((0, -41.254, -4.6875), D2shift, 2.02)
+D2_module3 = D2((-30.2, -41.254, -4.6875), D2shift, 2.03)
+D2_module4 = D2((45.3, -15.1, -4.6875), D2shift, 2.04)
+D2_module5 = D2((15.1, -15.1, -4.6875), D2shift, 2.05)
+D2_module6 = D2((-15.1, -15.1, -4.6875), D2shift, 2.06)
+D2_module7 = D2((-45.3, -15.1, -4.6875), D2shift, 2.07)
+D2_module8 = D2((45.3, 15.1, -4.6875), D2shift, 2.08)
+D2_module9 = D2((15.1, 15.1, -4.6875), D2shift, 2.09)
+D2_module10 = D2((-15.1, 15.1, -4.6875), D2shift, 2.10)
+D2_module11 = D2((-45.3, 15.1, -4.6875), D2shift, 2.11)
+D2_module12 = D2((30.2, 41.254, -4.6875), D2shift, 2.12)
+D2_module13 = D2((0, 41.254, -4.6875), D2shift, 2.13)
+D2_module14 = D2((-30.2, 41.254, -4.6875), D2shift, 2.14)
 
 VD1 = VetoDome1(SETU)
 VD2 = VetoDome2(SETU)
@@ -413,11 +413,27 @@ VD4 = VetoDome4(SETU)
 
 def identify_COMPTELmodule(sim_data):
     """
-    input is one row of data frame
+    Uses hit location and detector type in order to detemine detector module.
+
+    Paramerters
+    ------------
+        sim_data -- a row of a DataFrame containing the information of a
+                neutron interaction
+                (generally used with "apply" method of DataFrame)
+
+    Returns
+    --------
+        the the ID of the detector module that the interaction occurred in
+            format is X.Y where:
+            X-- 1: D1,  2: D2,  3: VetoDome
+            Y-- module id
+
     """
     position = (sim_data['x'], sim_data['y'], sim_data['z'])
 
-    if sim_data['DetectorID'] == 4:
+    # if detector is Cosima Anger camera (ID: 7)
+    #       these are the D1 and D2 layers
+    if sim_data['DetectorID'] == 7:
         if sim_data['z'] > 5:
             if D1_module1.check_point(position): return D1_module1.id
             elif D1_module2.check_point(position): return D1_module2.id
@@ -426,6 +442,7 @@ def identify_COMPTELmodule(sim_data):
             elif D1_module5.check_point(position): return D1_module5.id
             elif D1_module6.check_point(position): return D1_module6.id
             elif D1_module7.check_point(position): return D1_module7.id
+            else: print("IN D1!!")
         elif sim_data['z'] < 5:
             if D2_module1.check_point(position): return D2_module1.id
             elif D2_module2.check_point(position): return D2_module2.id
@@ -441,17 +458,27 @@ def identify_COMPTELmodule(sim_data):
             elif D2_module12.check_point(position): return D2_module12.id
             elif D2_module13.check_point(position): return D2_module13.id
             elif D2_module14.check_point(position): return D2_module14.id
-    elif sim_data['DetectorID'] == 7:
+            else: print("IN D2!!")
+        else:
+            print('help')
+            return 17
+    # if detector is Cosima scintillator (ID: 4)
+    #       these are the veto domes
+    elif sim_data['DetectorID'] == 4:
         if sim_data['z'] > 5:
             if VD1.check_point(position): return VD1.id
             elif VD2.check_point(position): return VD2.id
+            else:
+                print("IN VETO DOME 1 or 2!!")
         elif sim_data['z'] < 5:
             if VD3.check_point(position): return VD3.id
             elif VD4.check_point(position): return VD4.id
+            else:
+                print("IN VETO DOME 3 o4 4!!")
     elif sim_data['DetectorID'] == 0:
          return 0
     else:
         print("wut")
-        return 99999
+        return 99
 
 

@@ -12,7 +12,6 @@ STEP ONE
     change to electron equivalent energy
 STEP TWO
     weighted averages
-    ## def mean(a, axis=None, dtype=None, out=None, keepdims=False) ##
 STEP THREE
     broadening
 
@@ -41,6 +40,42 @@ Energy Loss
 
 """
 import math
+
+import numpy as np
+import pandas as pd
+from functools import reduce
+
+
+def create_hits(sim_data):
+    # a hit is a collection of interaction in one module
+    #   take sum of Eeee
+    #   weighted average: x, y, z,
+    #   unweighted average: hit time
+
+    data['EventID'].iloc[i] != data['EventID'].iloc[i+1]
+
+    # group by EventID
+    grp = sim_data.groupby(['EventID', 'DetectorID'])
+
+    # group again by ModuleID
+    new = grp.agg({
+                    'Incidents': '?',
+                    'StartTime': np.mean,
+                    'InteractionID': get rid of?,
+                    'OriginInteractionID': get rid of?,
+                    'DetectorID': lambda x: x,
+                    'x': lambda x: weighted_avg(x),
+                    'y': lambda x: weighted_avg(x),
+                    'z': lambda x: weighted_avg(x),
+                    'OriginalParticleID':
+                    'NewParticleID':
+                    'Energy': np.sum})
+
+
+def weighted_avg(input):
+    return np.average(sim_data[input], weights=sim_data['Energy'])
+
+
 
 def broaden_d1energy(interaction):
     if module == 1:
