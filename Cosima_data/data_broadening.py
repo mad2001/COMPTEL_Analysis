@@ -8,9 +8,9 @@ Author: Morgan A. Daly
 """
 
 """
-STEP ONE
+STEP ONE ------> DONE
     change to electron equivalent energy
-STEP TWO
+STEP TWO  ------> DONE
     weighted averages
 STEP THREE
     broadening
@@ -39,11 +39,10 @@ Energy Loss
     V4
 
 """
-import math
+from math import sqrt
 
 import numpy as np
 import pandas as pd
-from functools import reduce
 
 
 def create_hits(sim_data):
@@ -52,59 +51,112 @@ def create_hits(sim_data):
     #   weighted average: x, y, z,
     #   unweighted average: hit time
 
-    data['EventID'].iloc[i] != data['EventID'].iloc[i+1]
+    hits = sim_data.drop(sim_data.columns[[2, 10, 11]], axis=1)
 
-    # group by EventID
-    grp = sim_data.groupby(['EventID', 'DetectorID'])
+    # group by EventID and DetectorID
+    grp = hits.groupby(['EventID', 'DetectorID'])
 
-    # group again by ModuleID
-    new = grp.agg({
-                    'Incidents': '?',
-                    'StartTime': np.mean,
-                    'InteractionID': get rid of?,
-                    'OriginInteractionID': get rid of?,
-                    'DetectorID': lambda x: x,
+    # quick function to be used in aggregation
+    def weighted_avg(x):
+        try:
+            return np.average(x, weights=hits.loc[x.index, 'Energy'])
+        except ZeroDivisionError:
+            return x[x.first_valid_index()]
+
+    # aggregate data; this turns the individual interactions into 'hits'
+    hits = grp.agg({'Incidents': lambda x: x[x.first_valid_index()],
+                    'ElapsedTime': np.mean,
                     'x': lambda x: weighted_avg(x),
                     'y': lambda x: weighted_avg(x),
                     'z': lambda x: weighted_avg(x),
-                    'OriginalParticleID':
-                    'NewParticleID':
                     'Energy': np.sum})
-
-
-def weighted_avg(input):
-    return np.average(sim_data[input], weights=sim_data['Energy'])
+    return hits
 
 
 
-def broaden_d1energy(interaction):
-    if module == 1:
-        A = -1.022
-        B = 1.749
-    if module == 2:
-        A = -7.481
-        B = 2.157
-    if module == 3:
-        A = 2.944
-        B = 1.723
-    if module == 4:
-        A = -5.822
-        B = 1.935
-    if module == 5:
-        A = -3.073
-        B = 1.892
-    if module == 6:
-        A = -8.662
-        B = 2.069
-    if module == 7:
-        A = 0.020
-        B = 1.890
-    sigma = A + B * math.sqrt(energy)
-    return np.random.normal(energy, sigma)
 
 
-def broaden_d2energy(interaction):
-    sigma = math.sqrt(1.28*energy + 3.6*energy**2)
-    return np.random.normal(energy, sigma)
+
+def broaden(hits):
+    """
+    The reason this is so ungly is that in order to actually change the data
+    frame, the values being changed must be altered very explicitly.
+
+    Srry tessa
+    """
+
+    broaden = lambda x: np.random.normal(x, sigma_xy)
+
+
+    def d1energy_resolution(module):
+
+        if module == 1.01:
+            A = -1.022
+            B = 1.749
+        elif module == 1.02:
+            A = -7.481
+            B = 2.157
+        elif module == 1.03:
+            A = 2.944
+            B = 1.723
+        elif module == 1.04:
+            A = -5.822
+            B = 1.935
+        elif module == 1.05:
+            A = -3.073
+            B = 1.892
+        elif module == 1.06:
+            A = -8.662
+            B = 2.069
+        elif module == 1.07:
+            A = 0.020
+            B = 1.890
+        return lambda x: A + (B * sqrt(x))
+
+
+    def broaden_d1energy(energy):
+        try:
+            return np.random.normal(energy, energyres_function(energy))
+        except ValueError:
+            return energy
+
+
+    def broaden_d2energy(energy):
+        try:
+            return np.random.normal(energy, (1.28 * energy + 3.6 * energy **2))
+        except ValueError:
+            return energy
+
+
+    for DetectorID, group in hits.groupby(level='DetectorID'):
+
+        # if in D1
+        if 1 < DetectorID < 2:
+            sigma_xy = 1.6
+            hits.loc[(slice(None), DetectorID), 'x'] = group.x.apply(broaden)
+            hits.loc[(slice(None), DetectorID), 'y'] = group.y.apply(broaden)
+            hits.loc[(slice(None), DetectorID), 'z'] = 102.35
+            energyres_function = d1energy_resolution(DetectorID)
+            hits.loc[(slice(None), DetectorID), 'Energy'] = group.Energy.map(
+                        lambda x: broaden_d1energy(x))
+        # if in D2
+        elif 2 < DetectorID < 3:
+            sigma_xy = 1.4
+            hits.loc[(slice(None), DetectorID), 'x'] = group.x.apply(broaden)
+            hits.loc[(slice(None), DetectorID), 'y'] = group.y.apply(broaden)
+            hits.loc[(slice(None), DetectorID), 'z'] = -55.65
+
+            hits.loc[(slice(None), DetectorID), 'Energy'] = group.Energy.map(
+                        lambda x: broaden_d2energy(x))
+        # if in veto domes
+        elif 3 < DetectorID < 4:
+            continue
+        else:
+            continue
+    return hits
+
+
+
+
 
 

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
+
 """
 Created: Tue Jul  7 13:08:07 2015
 
 Author: Morgan A. Daly
-@todo maybe put data into classes?? will reassess
-
 
 This module contains functions to parse the text file output from Cosima,
 a Geant4 interface in the MEGAlib package.

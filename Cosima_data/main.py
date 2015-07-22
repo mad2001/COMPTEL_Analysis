@@ -8,6 +8,7 @@ Author: Morgan A. Daly
 import readsimfile
 import defining_volumes as vol
 from electron_equivalence import electron_equivalent
+import data_broadening as db
 
 
 filename = "COMPTELeffA_22MeV.inc1.id1.sim"
@@ -23,6 +24,10 @@ def main(filename):
     # convert to electron equivalent
     sim_data['Energy'] = sim_data.apply(electron_equivalent, axis=1)
 
-    return sim_data
+    hits = db.create_hits(sim_data)
+    hits = db.broaden(hits)
+
+    return hits
 
 data = main(filename)
+# current wall time: 12.9 s

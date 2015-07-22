@@ -275,6 +275,12 @@ class VetoDome1(Volume):
         else:
             return False
 
+    def check_veto(self, energy):
+        if energy > 230:
+            return True
+        else:
+            return False
+
 
 class VetoDome2(Volume):
     """
@@ -303,6 +309,13 @@ class VetoDome2(Volume):
             return True
         else:
             return False
+
+    def check_veto(self, energy):
+        if energy > 472:
+            return True
+        else:
+            return False
+
 
 
 
@@ -335,6 +348,14 @@ class VetoDome3(Volume):
             return False
 
 
+    def check_veto(self, energy):
+        if energy > 390:
+            return True
+        else:
+            return False
+
+
+
 
 class VetoDome4(Volume):
     """
@@ -360,6 +381,13 @@ class VetoDome4(Volume):
             return True
         # if in z range where there is overlap but is in x, y range return true
         elif 64 < np.sqrt(x**2 + y**2) < 72:
+            return True
+        else:
+            return False
+
+
+    def check_veto(self, energy):
+        if energy > 316:
             return True
         else:
             return False
