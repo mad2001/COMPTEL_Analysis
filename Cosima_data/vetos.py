@@ -6,6 +6,7 @@ Author: Morgan A. Daly
 """
 from defining_volumes import *
 
+
 def check_vetos(hits):
     for EventID, group in hits.groupby(level='EventID'):
         if any(group.index.get_level_values('DetectorID').isin([3.01])) and \
@@ -13,15 +14,15 @@ def check_vetos(hits):
             hits.drop(EventID, level='EventID', inplace=True)
             print('v1')
         elif any(group.index.get_level_values('DetectorID').isin([3.02])) and \
-                VD1.check_veto(group.Energy[3.02]):
+                VD2.check_veto(group.Energy[3.02]):
             hits.drop(EventID, level='EventID', inplace=True)
             print('v2')
         elif any(group.index.get_level_values('DetectorID').isin([3.03])) and \
-                VD1.check_veto(group.Energy[3.03]):
+                VD3.check_veto(group.Energy[3.03]):
             hits.drop(EventID, level='EventID', inplace=True)
             print('v3')
         elif any(group.index.get_level_values('DetectorID').isin([3.04])) and \
-                VD1.check_veto(group.Energy[3.04]):
+                VD4.check_veto(group.Energy[3.04]):
             hits.drop(EventID, level='EventID', inplace=True)
             print('v4')
     return hits
@@ -42,10 +43,16 @@ def construct_triggers(hits):
         d2 = [2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11,
               2.12, 2.13, 2.14]
 
+        check_vetos(hits)
+
         for EventID, group in hits.groupby(level='EventID'):
             if group.index.get_level_values('DetectorID').isin(d1).sum() == 1\
                     and group.index.get_level_values(
                     'DetectorID').isin(d2).sum() == 1:
-                continue
+#                if group.Energy[DetectorID] > 50 and \
+#                        group.Energy[DetectorID] > 100:
+                    continue
             else:
-                hits.drop(group.index)
+                hits.drop(EventID, level='EventID', inplace=True)
+
+        return hits

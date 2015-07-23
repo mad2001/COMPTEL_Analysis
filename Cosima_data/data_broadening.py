@@ -50,12 +50,8 @@ def create_hits(sim_data):
     #   take sum of Eeee
     #   weighted average: x, y, z,
     #   unweighted average: hit time
-
-    hits = sim_data.drop(sim_data.columns[[2, 10, 11]], axis=1)
-
-    # group by EventID and DetectorID
-    grp = hits.groupby(['EventID', 'DetectorID'])
-
+    sim_data.drop(sim_data.columns[[2, 10, 11]], axis=1, inplace=True)
+    hits = sim_data
     # quick function to be used in aggregation
     def weighted_avg(x):
         try:
@@ -64,15 +60,16 @@ def create_hits(sim_data):
             return x[x.first_valid_index()]
 
     # aggregate data; this turns the individual interactions into 'hits'
-    hits = grp.agg({'Incidents': lambda x: x[x.first_valid_index()],
+    hits = hits.groupby(['EventID', 'DetectorID']).agg(
+                    {'Incidents': lambda x: x[x.first_valid_index()],
                     'ElapsedTime': np.mean,
                     'x': lambda x: weighted_avg(x),
                     'y': lambda x: weighted_avg(x),
                     'z': lambda x: weighted_avg(x),
                     'Energy': np.sum})
+    hits = hits.drop(hits.loc[(slice(None), 0.00), :], axis=0)
+
     return hits
-
-
 
 
 
