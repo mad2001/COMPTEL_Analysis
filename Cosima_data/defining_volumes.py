@@ -204,21 +204,16 @@ class D2(Volume):
 
     def check_point(self, point_position):
         x, y, z = point_position
-#        if z < (self.z - self.half_height) or z > (self.z + self.half_height):
-#            print('part1')
-#            return False
-#        if abs(x) > (self.radius + abs(self.x)):
-#            print('part2')
-#            return False
-#        elif abs(y)  > (self.radius + abs(self.y)):
-#            print('part3')
-#            return False
+        if z < (self.z - self.half_height) or z > (self.z + self.half_height):
+            return False
+        if abs(x) > (self.radius + abs(self.x)):
+            return False
+        elif abs(y) > (self.radius + abs(self.y)):
+            return False
         if (((x - self.x)**2 + (y - self.y)**2)) < (self.radius**2):
             return True
-            print('nice')
         else:
             return False
-            print('the end')
 
 # XXX I literally have no idea if any of this works
 #   Veto dome method is definitely only guarunteed if inputting only
@@ -292,7 +287,9 @@ class VetoDome2(Volume):
     intention of being used only for the analysis of COMPTEL simulation data.
 
     """
+
     id = 3.2
+
     def __init__(self, mother=None):
         self.mother = mother
 
@@ -317,8 +314,6 @@ class VetoDome2(Volume):
             return False
 
 
-
-
 class VetoDome3(Volume):
     """
     The class for Veto Dome 3.
@@ -330,6 +325,7 @@ class VetoDome3(Volume):
 
     """
     id = 3.3
+
     def __init__(self, mother=None):
         self.mother = mother
 
@@ -347,14 +343,11 @@ class VetoDome3(Volume):
         else:
             return False
 
-
     def check_veto(self, energy):
         if energy > 390:
             return True
         else:
             return False
-
-
 
 
 class VetoDome4(Volume):
@@ -368,6 +361,7 @@ class VetoDome4(Volume):
 
     """
     id = 3.4
+
     def __init__(self, mother=None):
         self.mother = mother
 
@@ -384,7 +378,6 @@ class VetoDome4(Volume):
             return True
         else:
             return False
-
 
     def check_veto(self, energy):
         if energy > 316:
@@ -437,8 +430,6 @@ VD3 = VetoDome3(SETU)
 VD4 = VetoDome4(SETU)
 
 
-
-
 def identify_COMPTELmodule(sim_data):
     """
     Uses hit location and detector type in order to detemine detector module.
@@ -447,7 +438,7 @@ def identify_COMPTELmodule(sim_data):
     ------------
         sim_data -- a row of a DataFrame containing the information of a
                 neutron interaction
-                (generally used with "apply" method of DataFrame)
+                (expected to be used with "apply" method of DataFrame)
 
     Returns
     --------
@@ -457,11 +448,13 @@ def identify_COMPTELmodule(sim_data):
             Y-- module id
 
     """
+
     position = (sim_data['x'], sim_data['y'], sim_data['z'])
 
     # if detector is Cosima Anger camera (ID: 7)
     #       these are the D1 and D2 layers
     if sim_data['DetectorID'] == 7:
+        # check each D1 module if in upper half
         if sim_data['z'] > 5:
             if D1_module1.check_point(position): return D1_module1.id
             elif D1_module2.check_point(position): return D1_module2.id
@@ -470,7 +463,7 @@ def identify_COMPTELmodule(sim_data):
             elif D1_module5.check_point(position): return D1_module5.id
             elif D1_module6.check_point(position): return D1_module6.id
             elif D1_module7.check_point(position): return D1_module7.id
-            else: print("IN D1!!")
+        # check each D2 module if in lower half
         elif sim_data['z'] < 5:
             if D2_module1.check_point(position): return D2_module1.id
             elif D2_module2.check_point(position): return D2_module2.id
@@ -486,27 +479,25 @@ def identify_COMPTELmodule(sim_data):
             elif D2_module12.check_point(position): return D2_module12.id
             elif D2_module13.check_point(position): return D2_module13.id
             elif D2_module14.check_point(position): return D2_module14.id
-            else: print("IN D2!!")
         else:
-            print('help')
-            return 17
+            print('Error in D1 or D2 module definition')
     # if detector is Cosima scintillator (ID: 4)
     #       these are the veto domes
     elif sim_data['DetectorID'] == 4:
+        # check Veto Domes 1 and 2 if in upper half
         if sim_data['z'] > 5:
             if VD1.check_point(position): return VD1.id
             elif VD2.check_point(position): return VD2.id
             else:
-                print("IN VETO DOME 1 or 2!!")
+                print("Error in Veto Dome 1 or 2 definition")
+        # check Veto Domes 3 and 4 if in lower half
         elif sim_data['z'] < 5:
             if VD3.check_point(position): return VD3.id
             elif VD4.check_point(position): return VD4.id
             else:
-                print("IN VETO DOME 3 o4 4!!")
+                print("Error in Veto Dome 3 or 4 definition")
     elif sim_data['DetectorID'] == 0:
-         return 0
+        return 0
     else:
         print("wut")
         return 99
-
-

@@ -30,6 +30,28 @@ General process is as follows:
 
 
 
+           ########## Note About Output Format ############
+dtype: ndarray
+row: one per interaction
+columns:
+    0 event ID
+    1 number of incident particles
+    2 event's start time
+    3 interaction ID
+    4 interaction of origin ID
+    5 detector ID
+    6 time since start
+    7 x position of interaction in cm
+    8 y position of interaction in cm
+    9 z position of interaction in cm
+    10 ID of original particle
+        (key: 1 gamma, 2 positron, 3 electron, 4 proton, 6 neutron
+        18 deuteron, 20 He-3, 21 alpha)
+    11 ID of new particle
+    12 kinetic energy of new particle in keV
+
+
+
 
 
 ###########################################################################
