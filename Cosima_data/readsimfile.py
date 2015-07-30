@@ -34,6 +34,7 @@ def compile_regex():
     global event_re
     global event_values_re
     global interactions_re
+    global particle_count_re
 
     event_re = re.compile(r"""
         (?<=^SE$)                 # +lookbehind "SE" on its own line
@@ -52,6 +53,10 @@ def compile_regex():
         (?P<ia>[-+\de\s;\.]+)       # the formatting of values in interaction
         (?:\n)                      # noncapturing "\n"
         """, re.X | re.MULTILINE)
+    particle_count_re = re.compile(r"""
+        (?<=^TS\s)                  # +lookbehind "TS" starts line
+        (\d+?$)                    # capture number
+        """, re.X | re.MULTILINE)
 
     return
 
@@ -64,9 +69,13 @@ def parse_simfile(filename):
     events from the simulation as seperate strings.
 
     """
+    global particle_count
 
     with open(filename) as fh:
         simfile = fh.read()
+
+    particle_count = particle_count_re.search(simfile).group(0)
+    print('Particle count is {}'.format(particle_count))
 
     return event_re.findall(simfile)
 

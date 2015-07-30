@@ -27,7 +27,7 @@ def main(filename):
     hits = transform_data.create_hits(sim_data)
     hits = transform_data.broaden(hits)
 
-    return hits
+    return transform_data.identify_triggers(hits)
 
 data = main(filename)
 # current wall time: 12.9 s
