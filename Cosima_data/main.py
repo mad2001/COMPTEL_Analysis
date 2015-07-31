@@ -17,6 +17,8 @@ def main(filename):
 
     # convert *.sim file to Pandas data frame
     sim_data = readsimfile.return_simdata(filename)
+    global incident_energy
+    incident_energy = sim_data.Energy[0]
 
     # change detector ID to format that identifies detector and module
     sim_data['DetectorID'] = sim_data.apply(vol.identify_COMPTELmodule, axis=1)
@@ -29,5 +31,4 @@ def main(filename):
 
     return transform_data.identify_triggers(hits)
 
-data = main(filename)
-# current wall time: 12.9 s
+# current wall time: 15.6 s

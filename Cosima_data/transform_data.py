@@ -20,13 +20,18 @@ identify_triggers:: Identifies events that meet trigger criteria; elimates
     those that meet veto critera
 
 """
-import math
-
 import numpy as np
 import pandas as pd
 
 from defining_volumes import *
 
+
+# lists containing modules in each detector layer
+d1 = [1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07]
+d2 = [2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11,
+      2.12, 2.13, 2.14]
+veto_domes = [3.1, 3.2, 3.3, 3.4]
+    
 
 def electron_equivalent(sim_data):
     """
@@ -39,12 +44,6 @@ def electron_equivalent(sim_data):
     energy = sim_data['Energy']
     particle = sim_data['NewParticleID']
 
-    # lists containing modules in each detector layer
-    d1 = [1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07]
-    d2 = [2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11,
-          2.12, 2.13, 2.14]
-    veto_domes = [3.1, 3.2, 3.3, 3.4]
-
     # if electron/positron
     if particle == 2 or particle == 3:
         return energy
@@ -55,7 +54,7 @@ def electron_equivalent(sim_data):
         a_2 = 5.9
         a_3 = 0.065
         a_4 = 1.01
-        return a_1 * energy - a_2 * (1.0 - math.exp(-a_3 * energy**a_4))
+        return a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
 
     # if particle is proton, deuteron, or triton
     elif particle == 4 or particle == 18 or particle == 19:
@@ -65,7 +64,7 @@ def electron_equivalent(sim_data):
             a_2 = 2.82
             a_3 = 0.25
             a_4 = 0.93
-            return a_1 * energy - a_2 * (1.0 - math.exp(-a_3 * energy**a_4))
+            return a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
         # if interaction is in D2 layer (NaI)
         elif sim_data['DetectorID'] in d2:
             return energy
@@ -75,7 +74,7 @@ def electron_equivalent(sim_data):
             a_2 = 8.0
             a_3 = 0.1
             a_4 = 0.90
-            return a_1 * energy - a_2 * (1.0 - math.exp(-a_3 * energy**a_4))
+            return a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
 
     else:
         # particle is likely heavy nucleus with neglible light output
@@ -182,8 +181,8 @@ def broaden(hits):
 
     # go through each module type and broaden position and energy
     for DetectorID, group in hits.groupby(level='DetectorID'):
-        # if in D1
-        if 1 < DetectorID < 2:
+        
+        if DetectorID in d1:
             sigma_xy = 1.6
             hits.loc[(slice(None), DetectorID), 'x'] = group.x.apply(broaden)
             hits.loc[(slice(None), DetectorID), 'y'] = group.y.apply(broaden)
@@ -191,8 +190,8 @@ def broaden(hits):
             energyres_function = d1energy_resolution(DetectorID)
             hits.loc[(slice(None), DetectorID), 'Energy'] = group.Energy.map(
                         lambda x: broaden_d1energy(x))
-        # if in D2
-        elif 2 < DetectorID < 3:
+                        
+        elif DetectorID in d2:
             sigma_xy = 1.4
             hits.loc[(slice(None), DetectorID), 'x'] = group.x.apply(broaden)
             hits.loc[(slice(None), DetectorID), 'y'] = group.y.apply(broaden)
@@ -215,11 +214,6 @@ def identify_triggers(hits):
         delete
     if D1 < 50
     """
-
-    # lists containing all modules in each detector layer
-    d1 = [1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07]
-    d2 = [2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11,
-          2.12, 2.13, 2.14]
 
     for EventID, group in hits.groupby(level='EventID'):
 

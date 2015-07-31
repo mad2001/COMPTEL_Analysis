@@ -10,12 +10,10 @@ analysis. The positions and measurements used are those in the input file
 for Geomega's geometry analysis, ensuring consistency throughout the program.
 
 It is important to note that the objects as defined in this module are not
-volumes in the way that a ROOT/Geant4/ Geomega volume is. The classes and
-objects were created in order to encapsulate the information necessary to
+volumes in the way that a ROOT/Geant4/Geomega volume is. The classes and
+objects serve only to encapsulate the information necessary to
 derive the desired output. As such, care should be used if attempting to
 extend a defined class or object beyond its implementation in this program.
-(if it sounds like this is super brute forced that's because it is)
-
 
 Classses:
     Volume
@@ -27,7 +25,6 @@ Classses:
     VetoDome3
     VetoDome4
 
-@todo tbh this module is barely readable plz help
 """
 
 import numpy as np
@@ -215,9 +212,6 @@ class D2(Volume):
         else:
             return False
 
-# XXX I literally have no idea if any of this works
-#   Veto dome method is definitely only guarunteed if inputting only
-#   veto dome coordinate (ie. screening detector ID's)
 
 class VetoDome1(Volume):
     """
@@ -281,7 +275,6 @@ class VetoDome2(Volume):
     """
     The class for Veto Dome 2.
 
-
     Documentation is functionally identical to VetoDome1. The VetoDome classes
     are defined seperate merely for ease of use. They were created with the
     intention of being used only for the analysis of COMPTEL simulation data.
@@ -318,7 +311,6 @@ class VetoDome3(Volume):
     """
     The class for Veto Dome 3.
 
-
     Documentation is functionally identical to VetoDome1. The VetoDome classes
     are defined seperate merely for ease of use. They were created with the
     intention of being used only for the analysis of COMPTEL simulation data.
@@ -353,7 +345,6 @@ class VetoDome3(Volume):
 class VetoDome4(Volume):
     """
     The class for Veto Dome 4.
-
 
     Functionally identical to VetoDome1. The VetoDome classes are defined
     seperate merely for ease of use. They were created with thE intention of
@@ -396,6 +387,7 @@ class VetoDome4(Volume):
 #    position relative to (0, 0, 0)
 SETU = Virtual((0, 0, -117.4))
 
+# D1 volumes
 DET1 = Virtual((0, 0, 209.45), SETU)
 
 D1_module1 = D1((0, 0, 10.3), DET1, 1.01)
@@ -406,6 +398,7 @@ D1_module5 = D1((42.3, 0, 10.3), DET1, 1.05)
 D1_module6 = D1((26, -39.1, 10.3), DET1, 1.06)
 D1_module7 = D1((-26, -39.1, 10.3), DET1, 1.07)
 
+# D1 volumes
 DET2 = Virtual((0, 0, 52.1), SETU)
 D2shift = Virtual((0, 0, 14.3375), DET2)
 
@@ -424,6 +417,7 @@ D2_module12 = D2((30.2, 41.254, -4.6875), D2shift, 2.12)
 D2_module13 = D2((0, 41.254, -4.6875), D2shift, 2.13)
 D2_module14 = D2((-30.2, 41.254, -4.6875), D2shift, 2.14)
 
+# Veto domes
 VD1 = VetoDome1(SETU)
 VD2 = VetoDome2(SETU)
 VD3 = VetoDome3(SETU)
@@ -499,5 +493,5 @@ def identify_COMPTELmodule(sim_data):
     elif sim_data['DetectorID'] == 0:
         return 0
     else:
-        print("wut")
+        print("Error in geometry definition")
         return 99

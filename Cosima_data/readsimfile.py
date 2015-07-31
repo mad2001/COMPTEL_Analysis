@@ -75,7 +75,6 @@ def parse_simfile(filename):
         simfile = fh.read()
 
     particle_count = particle_count_re.search(simfile).group(0)
-    print('Particle count is {}'.format(particle_count))
 
     return event_re.findall(simfile)
 
