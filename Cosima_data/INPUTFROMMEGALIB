@@ -1,15 +1,15 @@
 INTERACTION KEY
     1: interaction type
-    2: ID of this interaction
-    3: ID of interaction this particle originated from
-    4: Detector ID
+    2(0): ID of this interaction
+    3(1): ID of interaction this particle originated from
+    4(2): Detector ID
         4: scintillator (here, anticoincidence domes)
         7: anger camera (here, D1/D2 scintillators)
-    5: Time since start of event in seconds
-    6: x position of interaction in cm
-    7: y position of interaction in cm
-    8: z position of interaction in cm
-    9: ID of original particle
+    5(3): Time since start of event in seconds
+    6(4): x position of interaction in cm
+    7(5): y position of interaction in cm
+    8(6): z position of interaction in cm
+    9(7): ID of original particle
         1: gamma
         2: positron
         3: electron
@@ -18,18 +18,18 @@ INTERACTION KEY
         18: deuteron
         20: He-3
         21: alpha
-    10: new x direction of original particle
-    11: new y direction of original particle
-    12: new z direction of original particle
-    13: new x polarization of original particle
-    14: new y polarization of original particle
-    15: new z polartization of original particle
-    16: new kinetic energy of original particle in keV
-    17: ID of new particle
-    18: x direction of new particle
-    19: y direction of new particle
-    20: z direction of new particle
-    21: x polarization of new particle
-    22: y polarization of new particle
-    23: z polarization of new particle
-    24: kinetic energy of new particle in keV
+    10(8): new x direction of original particle
+    11(9): new y direction of original particle
+    12(10): new z direction of original particle
+    13(11): new x polarization of original particle
+    14(12): new y polarization of original particle
+    15(13): new z polartization of original particle
+    16(14): new kinetic energy of original particle in keV
+    17(15): ID of new particle
+    18(16): x direction of new particle
+    19(17): y direction of new particle
+    20(18): z direction of new particle
+    21(19): x polarization of new particle
+    22(20): y polarization of new particle
+    23(21): z polarization of new particle
+    24(22): kinetic energy of new particle in keV

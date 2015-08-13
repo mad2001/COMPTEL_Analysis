@@ -23,7 +23,7 @@ identify_triggers:: Identifies events that meet trigger criteria; elimates
 import numpy as np
 import pandas as pd
 
-from defining_volumes import *
+from .defining_volumes import *
 
 
 # lists containing modules in each detector layer
@@ -31,7 +31,80 @@ d1 = [1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07]
 d2 = [2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11,
       2.12, 2.13, 2.14]
 veto_domes = [3.1, 3.2, 3.3, 3.4]
-    
+
+
+def identify_COMPTELmodule(sim_data):
+    """
+    Uses hit location and detector type in order to detemine detector module.
+
+    Paramerters
+    ------------
+        sim_data -- a row of a DataFrame containing the information of a
+                neutron interaction
+                (expected to be used with "apply" method of DataFrame)
+
+    Returns
+    --------
+        the the ID of the detector module that the interaction occurred in
+            format is X.Y where:
+            X-- 1: D1,  2: D2,  3: VetoDome
+            Y-- module id
+
+    """
+
+    position = (sim_data['x'], sim_data['y'], sim_data['z'])
+
+    # if detector is Cosima Anger camera (ID: 7)
+    #       these are the D1 and D2 layers
+    if sim_data['DetectorID'] == 7:
+        # check each D1 module if in upper half
+        if sim_data['z'] > 5:
+            if D1_module1.check_point(position): return D1_module1.id
+            elif D1_module2.check_point(position): return D1_module2.id
+            elif D1_module3.check_point(position): return D1_module3.id
+            elif D1_module4.check_point(position): return D1_module4.id
+            elif D1_module5.check_point(position): return D1_module5.id
+            elif D1_module6.check_point(position): return D1_module6.id
+            elif D1_module7.check_point(position): return D1_module7.id
+        # check each D2 module if in lower half
+        elif sim_data['z'] < 5:
+            if D2_module1.check_point(position): return D2_module1.id
+            elif D2_module2.check_point(position): return D2_module2.id
+            elif D2_module3.check_point(position): return D2_module3.id
+            elif D2_module4.check_point(position): return D2_module4.id
+            elif D2_module5.check_point(position): return D2_module5.id
+            elif D2_module6.check_point(position): return D2_module6.id
+            elif D2_module7.check_point(position): return D2_module7.id
+            elif D2_module8.check_point(position): return D2_module8.id
+            elif D2_module9.check_point(position): return D2_module9.id
+            elif D2_module10.check_point(position): return D2_module10.id
+            elif D2_module11.check_point(position): return D2_module11.id
+            elif D2_module12.check_point(position): return D2_module12.id
+            elif D2_module13.check_point(position): return D2_module13.id
+            elif D2_module14.check_point(position): return D2_module14.id
+        else:
+            print('Error in D1 or D2 module definition')
+    # if detector is Cosima scintillator (ID: 4)
+    #       these are the veto domes
+    elif sim_data['DetectorID'] == 4:
+        # check Veto Domes 1 and 2 if in upper half
+        if sim_data['z'] > 5:
+            if VD1.check_point(position): return VD1.id
+            elif VD2.check_point(position): return VD2.id
+            else:
+                print("Error in Veto Dome 1 or 2 definition")
+        # check Veto Domes 3 and 4 if in lower half
+        elif sim_data['z'] < 5:
+            if VD3.check_point(position): return VD3.id
+            elif VD4.check_point(position): return VD4.id
+            else:
+                print("Error in Veto Dome 3 or 4 definition")
+    elif sim_data['DetectorID'] == 0:
+        return 0
+    else:
+        print("Error in geometry definition")
+        return 99
+
 
 def electron_equivalent(sim_data):
     """
@@ -86,22 +159,19 @@ def create_hits(sim_data):
     """
     This turns the raw sim data into 'hits'; closer to detector output.
     """
-    sim_data.drop(sim_data.columns[[2, 10, 11]], axis=1, inplace=True)
-    hits = sim_data
 
     # function to be used in aggregation
     def weighted_avg(x):
         try:
-            return np.average(x, weights=hits.loc[x.index, 'Energy'])
+            return np.average(x, weights=sim_data.loc[x.index, 'Energy'])
         # accounts for possibility of all energy values being zero
         #       non issue, events will not trigger anyway
         except ZeroDivisionError:
             return x[x.first_valid_index()]
 
-    # aggregate data; this turns the individual interactions into 'hits'
-    hits = hits.groupby(['EventID', 'DetectorID']).agg(
-                    {'Incidents': lambda x: x[x.first_valid_index()],
-                     'ElapsedTime': np.mean,
+    # aggregate data; turns the individual interactions into 'hits'
+    hits = sim_data.groupby(['EventID', 'DetectorID']).agg(
+                    {'ElapsedTime': np.mean,
                      'x': lambda x: weighted_avg(x),
                      'y': lambda x: weighted_avg(x),
                      'z': lambda x: weighted_avg(x),
@@ -181,7 +251,7 @@ def broaden(hits):
 
     # go through each module type and broaden position and energy
     for DetectorID, group in hits.groupby(level='DetectorID'):
-        
+
         if DetectorID in d1:
             sigma_xy = 1.6
             hits.loc[(slice(None), DetectorID), 'x'] = group.x.apply(broaden)
@@ -190,7 +260,7 @@ def broaden(hits):
             energyres_function = d1energy_resolution(DetectorID)
             hits.loc[(slice(None), DetectorID), 'Energy'] = group.Energy.map(
                         lambda x: broaden_d1energy(x))
-                        
+
         elif DetectorID in d2:
             sigma_xy = 1.4
             hits.loc[(slice(None), DetectorID), 'x'] = group.x.apply(broaden)
@@ -259,19 +329,13 @@ def identify_triggers(hits):
 
         tof = d2_data['ElapsedTime'].sub(d1_data['ElapsedTime'].values)
 
-        final = pd.DataFrame(
+        return pd.DataFrame(
             {'D1Energy': d1_data.Energy.values,
              'D1Position': list(zip(d1_data.x.values, d1_data.y.values, d1_data.z.values)),
              'D2Energy': d2_data.Energy.values,
              'D2Position': list(zip(d2_data.x.values, d2_data.y.values, d2_data.z.values)),
              'TimeOfFlight': tof.values
              })
-        return final
 
-    hits = reformat_dataframe(hits)
-
-    global triggered_events
-    triggered_events = hits.shape[0]
-
-    return hits
+    return reformat_dataframe(hits)
 

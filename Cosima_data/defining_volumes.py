@@ -30,6 +30,16 @@ Classses:
 import numpy as np
 
 
+__all__ = ["Volume", "Virtual", "D1", "D2", "VetoDome1", "VetoDome2",
+           "VetoDome3", "VetoDome4", "SETU", "DET1", "D1_module1",
+           "D1_module2", "D1_module3", "D1_module4", "D1_module5",
+           "D1_module6", "D1_module7", "DET2", "D2shift", "D2_module1",
+           "D2_module2", "D2_module3", "D2_module4", "D2_module5",
+           "D2_module6", "D2_module7", "D2_module8", "D2_module9",
+           "D2_module10", "D2_module11", "D2_module12", "D2_module13",
+           "D2_module14", "VD1", "VD2", "VD3", "VD4"]
+
+
 class Volume(object):
     """
     A volume; written for expressing volumes defined in MEGAlib's Geomega.
@@ -422,76 +432,3 @@ VD1 = VetoDome1(SETU)
 VD2 = VetoDome2(SETU)
 VD3 = VetoDome3(SETU)
 VD4 = VetoDome4(SETU)
-
-
-def identify_COMPTELmodule(sim_data):
-    """
-    Uses hit location and detector type in order to detemine detector module.
-
-    Paramerters
-    ------------
-        sim_data -- a row of a DataFrame containing the information of a
-                neutron interaction
-                (expected to be used with "apply" method of DataFrame)
-
-    Returns
-    --------
-        the the ID of the detector module that the interaction occurred in
-            format is X.Y where:
-            X-- 1: D1,  2: D2,  3: VetoDome
-            Y-- module id
-
-    """
-
-    position = (sim_data['x'], sim_data['y'], sim_data['z'])
-
-    # if detector is Cosima Anger camera (ID: 7)
-    #       these are the D1 and D2 layers
-    if sim_data['DetectorID'] == 7:
-        # check each D1 module if in upper half
-        if sim_data['z'] > 5:
-            if D1_module1.check_point(position): return D1_module1.id
-            elif D1_module2.check_point(position): return D1_module2.id
-            elif D1_module3.check_point(position): return D1_module3.id
-            elif D1_module4.check_point(position): return D1_module4.id
-            elif D1_module5.check_point(position): return D1_module5.id
-            elif D1_module6.check_point(position): return D1_module6.id
-            elif D1_module7.check_point(position): return D1_module7.id
-        # check each D2 module if in lower half
-        elif sim_data['z'] < 5:
-            if D2_module1.check_point(position): return D2_module1.id
-            elif D2_module2.check_point(position): return D2_module2.id
-            elif D2_module3.check_point(position): return D2_module3.id
-            elif D2_module4.check_point(position): return D2_module4.id
-            elif D2_module5.check_point(position): return D2_module5.id
-            elif D2_module6.check_point(position): return D2_module6.id
-            elif D2_module7.check_point(position): return D2_module7.id
-            elif D2_module8.check_point(position): return D2_module8.id
-            elif D2_module9.check_point(position): return D2_module9.id
-            elif D2_module10.check_point(position): return D2_module10.id
-            elif D2_module11.check_point(position): return D2_module11.id
-            elif D2_module12.check_point(position): return D2_module12.id
-            elif D2_module13.check_point(position): return D2_module13.id
-            elif D2_module14.check_point(position): return D2_module14.id
-        else:
-            print('Error in D1 or D2 module definition')
-    # if detector is Cosima scintillator (ID: 4)
-    #       these are the veto domes
-    elif sim_data['DetectorID'] == 4:
-        # check Veto Domes 1 and 2 if in upper half
-        if sim_data['z'] > 5:
-            if VD1.check_point(position): return VD1.id
-            elif VD2.check_point(position): return VD2.id
-            else:
-                print("Error in Veto Dome 1 or 2 definition")
-        # check Veto Domes 3 and 4 if in lower half
-        elif sim_data['z'] < 5:
-            if VD3.check_point(position): return VD3.id
-            elif VD4.check_point(position): return VD4.id
-            else:
-                print("Error in Veto Dome 3 or 4 definition")
-    elif sim_data['DetectorID'] == 0:
-        return 0
-    else:
-        print("Error in geometry definition")
-        return 99

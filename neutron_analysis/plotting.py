@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 def plot_efficiency(energy, efficiency):
     plt.plot(energy, efficiency)
-    plt.ylabel('Electron Equivalent Energy (MeV)')
+    plt.ylabel('Efficiency (%)')
     plt.xlabel('Energy (MeV)')
     plt.title('Detector Efficiency')
     plt.grid(True)
