@@ -160,21 +160,16 @@ def create_hits(sim_data):
     This turns the raw sim data into 'hits'; closer to detector output.
     """
 
-    # function to be used in aggregation
-    def weighted_avg(x):
-        try:
-            return np.average(x, weights=sim_data.loc[x.index, 'Energy'])
-        # accounts for possibility of all energy values being zero
-        #       non issue, events will not trigger anyway
-        except ZeroDivisionError:
-            return x[x.first_valid_index()]
+    # filter group
+    hits = sim_data.groupby(['EventID', 'DetectorID']).filter(
+            lambda x: x['Energy'].sum() != 0)
 
-    # aggregate data; turns the individual interactions into 'hits'
-    hits = sim_data.groupby(['EventID', 'DetectorID']).agg(
+    # aggregate data; turns the individual interactions into 'hits'`
+    hits = hits.groupby(['EventID', 'DetectorID']).agg(
                     {'ElapsedTime': np.mean,
-                     'x': lambda x: weighted_avg(x),
-                     'y': lambda x: weighted_avg(x),
-                     'z': lambda x: weighted_avg(x),
+                     'x': lambda x: np.average(x, weights=hits.loc[x.index, 'Energy']),
+                     'y': lambda x: np.average(x, weights=hits.loc[x.index, 'Energy']),
+                     'z': lambda x: np.average(x, weights=hits.loc[x.index, 'Energy']),
                      'Energy': np.sum})
 
     # drop data with Detector ID '0.00'; these are 'INIT' interactions and
@@ -285,43 +280,39 @@ def identify_triggers(hits):
     if D1 < 50
     """
 
-    for EventID, group in hits.groupby(level='EventID'):
 
-        # to sort data
-        grp_idx = group.index.get_level_values('DetectorID')
-        d1_idx = grp_idx.isin(d1)
-        d2_idx = grp_idx.isin(d2)
-        try:
-            time_of_flight = group.ElapsedTime[d2_idx].sub(
-              group.ElapsedTime[d1_idx].values)
-        except ValueError:
-            hits.drop(EventID, level='EventID', inplace=True)
-            continue
+    def filters(event):
 
-        # trigger requirements
-        d1_d2_hits = d1_idx.sum() == 1 and d2_idx.sum() == 1
-        threshold_energy = all(group.Energy[d1_idx] > 50) and \
-            all(group.Energy[d2_idx] > 100)
-        tof_requirement = all(time_of_flight > 0)
+        idx = event.index.get_level_values('DetectorID')
 
-        # check for any vetos
-        if any(grp_idx.isin([3.01])) and VD1.check_veto(group.Energy[3.01]):
-            hits.drop(EventID, level='EventID', inplace=True)
-        elif any(grp_idx.isin([3.02])) and VD2.check_veto(group.Energy[3.02]):
-            hits.drop(EventID, level='EventID', inplace=True)
-        elif any(grp_idx.isin([3.03])) and VD3.check_veto(group.Energy[3.03]):
-            hits.drop(EventID, level='EventID', inplace=True)
-        elif any(grp_idx.isin([3.04])) and VD4.check_veto(group.Energy[3.04]):
-            hits.drop(EventID, level='EventID', inplace=True)
-
-        # check all trigger requirements
-        elif d1_d2_hits and threshold_energy:
-            if tof_requirement:
-                continue
-            else:
-                hits.drop(EventID, level='EventID', inplace=True)
+        if idx.isin(d1).sum() == 1 and idx.isin(d2).sum() == 1:
+           pass
         else:
-            hits.drop(EventID, level='EventID', inplace=True)
+           return False
+        if all(event.Energy[idx.isin(d1)] > 50) and all(event.Energy[idx.isin(d2)] > 100):
+            pass
+        else:
+            return False
+        if all(event.ElapsedTime[idx.isin(d2)].sub(event.ElapsedTime[idx.isin(d1)].values) > 0):
+            pass
+        else:
+            return False
+
+
+        if any(idx.isin([3.01])) and VD1.check_veto(event.Energy[3.01]):
+            return False
+        elif any(idx.isin([3.02])) and VD2.check_veto(event.Energy[3.02]):
+            return False
+        elif any(idx.isin([3.03])) and VD3.check_veto(event.Energy[3.03]):
+            return False
+        elif any(idx.isin([3.04])) and VD4.check_veto(event.Energy[3.04]):
+            return False
+
+        else:
+            return True
+
+    hits = hits.groupby(level='EventID').filter(filters)
+
 
     def reformat_dataframe(data):
         d1_data = data.select(lambda x: x[1] in d1)
