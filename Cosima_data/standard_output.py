@@ -23,6 +23,7 @@ def standard(filename):
 
     hits = tr.create_hits(sim_data)
     hits = tr.broaden(hits)
+    #hits.plot(x='x', y='y', kind='scatter')
     hits = tr.identify_triggers(hits)
 
     return {'hits': hits,

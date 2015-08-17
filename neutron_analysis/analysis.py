@@ -17,8 +17,8 @@ import matplotlib.pyplot as plt
 
 def efficiency(data, plot=False):
 
-    simulated_particles = data[1]
-    triggered = data[2]
+    simulated_particles = data[:, 1]
+    triggered = data[:, 2]
 
     # measurements from simulation geometry files
     s = 16         # number of sides of scintillator's polygon volume
@@ -34,9 +34,16 @@ def efficiency(data, plot=False):
     # calculate detector efficiency
     efficiency = (effective_area / detector_area)*100
 
+    # O'Neill efficiency data
+    comp_energy = [17.2, 22, 35.7, 77]
+    comp_eff = [.127, .144, .08, .053]
+    err = [.005, .006, .004, .004]
+
     if plot:
-        energy = data[0]
-        plt.plot(energy, efficiency)
+        energy = data[:, 0]
+        plt.plot((energy / 1000), efficiency, marker='o', linestyle='None')
+        plt.hold(True)
+        plt.errorbar(comp_energy, comp_eff, yerr=err, fmt='.')
         plt.ylabel('Efficiency (%)')
         plt.xlabel('Energy (MeV)')
         plt.title('Detector Efficiency')
@@ -46,13 +53,35 @@ def efficiency(data, plot=False):
     return efficiency
 
 
+def energy_res(data):
+
+    # normal vector from point in D1 to point in D2
+    distance = (np.linalg.norm(data[['x_2', 'y_2', 'z_2']].values -
+                               data[['x_1', 'y_1', 'z_1']].values, axis=1)) * .01
+    print(distance)
+
+    # calculate classical kinetic energy
+    E_n = .5 * m_n * ((distance / data['TimeOfFlight'].values) ** 2)
+    # convert to keV
+    E_n = E_n / (eV * kilo)
+
+
+    plt.hist((E_n + data['D1Energy'].values), bins=20, range=(0, 20000))
+    plt.ylabel('counts')
+    plt.xlabel('Energy (keV)')
+    plt.title('Energy Resolution')
+    plt.show()
+
+    return E_n
+
+
 def angular_res(data, inplace=False):
 
     phi_src = 0
     theta_src = 0
 
     distance = np.linalg.norm(data[['x_2', 'y_2', 'z_2']].values -
-                    data[['x_1', 'y_1', 'z_1']].values, axis=1)
+                              data[['x_1', 'y_1', 'z_1']].values, axis=1)
 
     # calculate classical kinetic energy
     E_n = .5 * m_n * (distance / data['TimeOfFlight'].values)
@@ -71,6 +100,7 @@ def angular_res(data, inplace=False):
                 * sin(theta_src) * cos(phi_scttrd - phi_src))
 
     if inplace:
+        data['NeutronKE'] = E_n
         data['arm'] = phi_measured - phi_geo
         return data
     else:

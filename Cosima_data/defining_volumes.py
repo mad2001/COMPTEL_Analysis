@@ -275,7 +275,7 @@ class VetoDome1(Volume):
             return False
 
     def check_veto(self, energy):
-        if energy > 230:
+        if energy > 50:
             return True
         else:
             return False
@@ -311,7 +311,7 @@ class VetoDome2(Volume):
             return False
 
     def check_veto(self, energy):
-        if energy > 472:
+        if energy > 50:
             return True
         else:
             return False
@@ -346,7 +346,7 @@ class VetoDome3(Volume):
             return False
 
     def check_veto(self, energy):
-        if energy > 390:
+        if energy > 50:
             return True
         else:
             return False
@@ -381,12 +381,10 @@ class VetoDome4(Volume):
             return False
 
     def check_veto(self, energy):
-        if energy > 316:
+        if energy > 50:
             return True
         else:
             return False
-
-
 
 
 

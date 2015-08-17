@@ -45,7 +45,7 @@ def pull_simdata(filename):
         """, re.X | re.MULTILINE)
 
     # create list of all events as strings
-    with open(filename) as fh:
+    with open(filename, 'r') as fh:
         simfile = fh.read()
     all_events = event_re.findall(simfile)
 
@@ -106,6 +106,6 @@ def pull_simdata(filename):
 
 # Wall time: 3.29 s
 if __name__ == '__main__':
-    filename = "COMPTELeffA_22MeV.inc1.id1.sim"
+    filename = "fulldataCOMPTEL_20MeV.inc1.id1.sim"
     data = pull_simdata(filename)
 

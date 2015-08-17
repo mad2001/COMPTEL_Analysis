@@ -106,11 +106,14 @@ def electron_equivalent(sim_data):
 
     # if particle is alpha or He-3
     elif particle == 21 or particle == 20:
-        a_1 = 0.41
-        a_2 = 5.9
-        a_3 = 0.065
-        a_4 = 1.01
-        return a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
+        if sim_data['DetectorID'] in d1 or sim_data['DetectorID'] in veto_domes:
+            a_1 = 0.42
+            a_2 = 5.9
+            a_3 = 0.065
+            a_4 = 1.01
+            return a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
+        elif sim_data['DetectorID'] in d2:
+            return energy
 
     # if particle is proton, deuteron, or triton
     elif particle == 4 or particle == 18 or particle == 19:
@@ -205,7 +208,8 @@ def broaden(hits):
         """
 
         try:
-            return np.random.normal(energy, energyres_function(energy))
+            #return np.random.normal(energy, energyres_function(energy))
+            return np.random.normal(energy, (1.1 * energy ** .57))
         # accounts for possibility of all energy values being zero
         except ValueError:
             return energy
@@ -219,7 +223,8 @@ def broaden(hits):
         """
 
         try:
-            return np.random.normal(energy, (1.28 * energy + 3.6 * energy **2))
+            #return np.random.normal(energy, (1.28 * energy + 3.6 * energy **2))
+            return np.random.normal(energy, (1.72 * np.sqrt(energy) - 11.8))
         # accounts for possibility of all energy values being zero
         except ValueError:
             return energy
@@ -262,22 +267,22 @@ def identify_triggers(hits):
         delete
     if D1 < 50
     """
-
+    import matplotlib.pyplot as plt
 
     def filters(event):
 
         idx = event.index.get_level_values('DetectorID')
 
         good_path = idx.isin(d1).sum() == 1 and idx.isin(d2).sum() == 1
-        energy_thrshld = all(event.Energy[idx.isin(d1)] > 50) and all(
-                    event.Energy[idx.isin(d2)] > 100)
-
+        energy_thrshld = all(event.Energy[idx.isin(d1)] > 65) and all(
+                    event.Energy[idx.isin(d2)] > 600)
 
         if good_path:
-            good_tof = all(event.ElapsedTime[idx.isin(d2)].sub(
-                    event.ElapsedTime[idx.isin(d1)].values) > 0)
+            tof = event.ElapsedTime[idx.isin(d2)].sub(
+                    event.ElapsedTime[idx.isin(d1)].values)
+            tof = np.random.normal(tof, 1e-9)
 
-            if energy_thrshld and good_tof:
+            if energy_thrshld and (0 < tof < 40.7e-9):
                 pass
             else:
                 return False
@@ -297,11 +302,15 @@ def identify_triggers(hits):
 
     hits = hits.groupby(level='EventID').filter(filters)
 
-
     d1_data = hits.select(lambda x: x[1] in d1)
     d2_data = hits.select(lambda x: x[1] in d2)
 
     tof = d2_data['ElapsedTime'].sub(d1_data['ElapsedTime'].values)
+    plt.figure()
+    plt.hist(tof, bins=20)
+    tof = np.random.normal(tof, 1e-9)
+    plt.figure()
+    plt.hist(tof, bins=20)
 
     return pd.DataFrame(
             {'D1Energy': d1_data.Energy.values,
