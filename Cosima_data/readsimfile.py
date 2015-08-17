@@ -10,8 +10,6 @@ This module contains functions to parse the text file output from Cosima,
 a Geant4 interface in the MEGAlib package.
 Important data is organized into a ndarray to allow for further analysis.
 
-Wall time: 3.29 s
-
 """
 
 import re
@@ -106,7 +104,7 @@ def pull_simdata(filename):
             'incident energy': sim_data.Energy[0]}
 
 
-
+# Wall time: 3.29 s
 if __name__ == '__main__':
     filename = "COMPTELeffA_22MeV.inc1.id1.sim"
     data = pull_simdata(filename)

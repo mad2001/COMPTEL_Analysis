@@ -59,29 +59,12 @@ def identify_COMPTELmodule(sim_data):
     if sim_data['DetectorID'] == 7:
         # check each D1 module if in upper half
         if sim_data['z'] > 5:
-            if D1_module1.check_point(position): return D1_module1.id
-            elif D1_module2.check_point(position): return D1_module2.id
-            elif D1_module3.check_point(position): return D1_module3.id
-            elif D1_module4.check_point(position): return D1_module4.id
-            elif D1_module5.check_point(position): return D1_module5.id
-            elif D1_module6.check_point(position): return D1_module6.id
-            elif D1_module7.check_point(position): return D1_module7.id
+            for module in d1_modules:
+                if module.check_point(position): return module.id
         # check each D2 module if in lower half
         elif sim_data['z'] < 5:
-            if D2_module1.check_point(position): return D2_module1.id
-            elif D2_module2.check_point(position): return D2_module2.id
-            elif D2_module3.check_point(position): return D2_module3.id
-            elif D2_module4.check_point(position): return D2_module4.id
-            elif D2_module5.check_point(position): return D2_module5.id
-            elif D2_module6.check_point(position): return D2_module6.id
-            elif D2_module7.check_point(position): return D2_module7.id
-            elif D2_module8.check_point(position): return D2_module8.id
-            elif D2_module9.check_point(position): return D2_module9.id
-            elif D2_module10.check_point(position): return D2_module10.id
-            elif D2_module11.check_point(position): return D2_module11.id
-            elif D2_module12.check_point(position): return D2_module12.id
-            elif D2_module13.check_point(position): return D2_module13.id
-            elif D2_module14.check_point(position): return D2_module14.id
+            for module in d2_modules:
+                if module.check_point(position): return module.id
         else:
             print('Error in D1 or D2 module definition')
     # if detector is Cosima scintillator (ID: 4)
@@ -285,27 +268,28 @@ def identify_triggers(hits):
 
         idx = event.index.get_level_values('DetectorID')
 
-        if idx.isin(d1).sum() == 1 and idx.isin(d2).sum() == 1:
-           pass
-        else:
-           return False
-        if all(event.Energy[idx.isin(d1)] > 50) and all(event.Energy[idx.isin(d2)] > 100):
-            pass
-        else:
-            return False
-        if all(event.ElapsedTime[idx.isin(d2)].sub(event.ElapsedTime[idx.isin(d1)].values) > 0):
-            pass
+        good_path = idx.isin(d1).sum() == 1 and idx.isin(d2).sum() == 1
+        energy_thrshld = all(event.Energy[idx.isin(d1)] > 50) and all(
+                    event.Energy[idx.isin(d2)] > 100)
+
+
+        if good_path:
+            good_tof = all(event.ElapsedTime[idx.isin(d2)].sub(
+                    event.ElapsedTime[idx.isin(d1)].values) > 0)
+
+            if energy_thrshld and good_tof:
+                pass
+            else:
+                return False
         else:
             return False
 
+        veto1 = any(idx.isin([3.01])) and VD1.check_veto(event.Energy[3.01])
+        veto2 = any(idx.isin([3.02])) and VD2.check_veto(event.Energy[3.02])
+        veto3 = any(idx.isin([3.03])) and VD3.check_veto(event.Energy[3.03])
+        veto4 = any(idx.isin([3.04])) and VD4.check_veto(event.Energy[3.04])
 
-        if any(idx.isin([3.01])) and VD1.check_veto(event.Energy[3.01]):
-            return False
-        elif any(idx.isin([3.02])) and VD2.check_veto(event.Energy[3.02]):
-            return False
-        elif any(idx.isin([3.03])) and VD3.check_veto(event.Energy[3.03]):
-            return False
-        elif any(idx.isin([3.04])) and VD4.check_veto(event.Energy[3.04]):
+        if veto1 or veto2 or veto3 or veto4:
             return False
 
         else:
@@ -314,19 +298,16 @@ def identify_triggers(hits):
     hits = hits.groupby(level='EventID').filter(filters)
 
 
-    def reformat_dataframe(data):
-        d1_data = data.select(lambda x: x[1] in d1)
-        d2_data = data.select(lambda x: x[1] in d2)
+    d1_data = hits.select(lambda x: x[1] in d1)
+    d2_data = hits.select(lambda x: x[1] in d2)
 
-        tof = d2_data['ElapsedTime'].sub(d1_data['ElapsedTime'].values)
+    tof = d2_data['ElapsedTime'].sub(d1_data['ElapsedTime'].values)
 
-        return pd.DataFrame(
+    return pd.DataFrame(
             {'D1Energy': d1_data.Energy.values,
-             'D1Position': list(zip(d1_data.x.values, d1_data.y.values, d1_data.z.values)),
+             'x_1': d1_data.x.values, 'y_1': d1_data.y.values, 'z_1': d1_data.z.values,
              'D2Energy': d2_data.Energy.values,
-             'D2Position': list(zip(d2_data.x.values, d2_data.y.values, d2_data.z.values)),
-             'TimeOfFlight': tof.values
-             })
-
-    return reformat_dataframe(hits)
+             'x_2': d2_data.x.values, 'y_2': d2_data.y.values, 'z_2': d2_data.z.values,
+             'TimeOfFlight': tof
+             }).reset_index(level='DetectorID', drop=True)
 

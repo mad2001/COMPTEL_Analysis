@@ -37,7 +37,7 @@ __all__ = ["Volume", "Virtual", "D1", "D2", "VetoDome1", "VetoDome2",
            "D2_module2", "D2_module3", "D2_module4", "D2_module5",
            "D2_module6", "D2_module7", "D2_module8", "D2_module9",
            "D2_module10", "D2_module11", "D2_module12", "D2_module13",
-           "D2_module14", "VD1", "VD2", "VD3", "VD4"]
+           "D2_module14", "d1_modules", "d2_modules", "VD1", "VD2", "VD3", "VD4"]
 
 
 class Volume(object):
@@ -426,6 +426,12 @@ D2_module11 = D2((-45.3, 15.1, -4.6875), D2shift, 2.11)
 D2_module12 = D2((30.2, 41.254, -4.6875), D2shift, 2.12)
 D2_module13 = D2((0, 41.254, -4.6875), D2shift, 2.13)
 D2_module14 = D2((-30.2, 41.254, -4.6875), D2shift, 2.14)
+
+d1_modules = [D1_module1, D1_module2, D1_module3, D1_module4, D1_module5,
+              D1_module6, D1_module7]
+d2_modules = [D2_module1, D2_module2, D2_module3, D2_module4, D2_module5,
+              D2_module6, D2_module7, D2_module8, D2_module9, D2_module10,
+              D2_module11, D2_module12, D2_module13, D2_module14]
 
 # Veto domes
 VD1 = VetoDome1(SETU)
