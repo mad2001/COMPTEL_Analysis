@@ -61,7 +61,7 @@ def pull_simdata(filename):
         each row of the interaction array in order to combine the information.
 
 
-        Paramerters
+        Parameters
         ------------
             one_event -- an individual event string
 
@@ -106,6 +106,6 @@ def pull_simdata(filename):
 
 # Wall time: 3.29 s
 if __name__ == '__main__':
-    filename = "fulldataCOMPTEL_20MeV.inc1.id1.sim"
+    filename = "COMPTELeffA_22MeV.inc1.id1.sim"
     data = pull_simdata(filename)
 

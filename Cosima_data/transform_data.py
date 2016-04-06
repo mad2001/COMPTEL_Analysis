@@ -278,6 +278,7 @@ def identify_triggers(hits):
                     event.Energy[idx.isin(d2)] > 600)
 
         if good_path:
+            global tof
             tof = event.ElapsedTime[idx.isin(d2)].sub(
                     event.ElapsedTime[idx.isin(d1)].values)
             tof = np.random.normal(tof, 1e-9)
@@ -306,11 +307,11 @@ def identify_triggers(hits):
     d2_data = hits.select(lambda x: x[1] in d2)
 
     tof = d2_data['ElapsedTime'].sub(d1_data['ElapsedTime'].values)
-    plt.figure()
+    """plt.figure()
     plt.hist(tof, bins=20)
     tof = np.random.normal(tof, 1e-9)
     plt.figure()
-    plt.hist(tof, bins=20)
+    plt.hist(tof, bins=20)"""
 
     return pd.DataFrame(
             {'D1Energy': d1_data.Energy.values,
