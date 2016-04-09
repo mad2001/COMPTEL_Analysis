@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 """
 Created on Tue Apr  5 20:50:52 2016
 
@@ -27,7 +27,6 @@ def run_sims():
 
         with open(source_file, 'w') as out_file:
             out_file.writelines(lines)
-
 
         # change to external hard drive so that *.sim files will save there
         d = '/Volumes/MORGAN/carbon_simulation_data'
