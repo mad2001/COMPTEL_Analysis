@@ -202,17 +202,17 @@ def broaden(hits):
             B = 1.890
         return lambda x: A + (B * np.sqrt(x))
 
-    def broaden_d1energy(energy):
-        """
-        Returns broadened energy for D1.
-        """
-
-        try:
-            #return np.random.normal(energy, energyres_function(energy))
-            return np.random.normal(energy, (1.1 * energy ** .57))
-        # accounts for possibility of all energy values being zero
-        except ValueError:
-            return energy
+#    def broaden_d1energy(energy):
+#        """
+#        Returns broadened energy for D1.
+#        """
+#
+#        try:
+#            #return np.random.normal(energy, energyres_function(energy))
+#            return np.random.normal(energy, (1.1 * energy ** .57))
+#        # accounts for possibility of all energy values being zero
+#        except ValueError:
+#            return energy
 
     def broaden_d2energy(energy):
         """
@@ -223,9 +223,13 @@ def broaden(hits):
         """
 
         try:
-            #return np.random.normal(energy, (1.28 * energy + 3.6 * energy **2))
-            return np.random.normal(energy, (1.72 * np.sqrt(energy) - 11.8))
-        # accounts for possibility of all energy values being zero
+            # this is resolution that Mark gave
+            return np.random.normal(energy, (1.28 * energy + 3.6 * energy **2))
+
+           # not sure where this resolution came from?
+            #return np.random.normal(energy, (1.72 * np.sqrt(energy) - 11.8))
+
+       # accounts for possibility of all energy values being zero
         except ValueError:
             return energy
 
@@ -240,7 +244,8 @@ def broaden(hits):
             hits.loc[(slice(None), DetectorID), 'x'] = group.x.apply(broaden)
             hits.loc[(slice(None), DetectorID), 'y'] = group.y.apply(broaden)
             hits.loc[(slice(None), DetectorID), 'z'] = 102.35
-            energyres_function = d1energy_resolution(DetectorID)
+            # CHANGED THIS FROM THE FUNCTION ABOVE, HOPEFULLY DOESN'T BREAK
+            broaden_d1energy = d1energy_resolution(DetectorID)
             hits.loc[(slice(None), DetectorID), 'Energy'] = group.Energy.map(
                         lambda x: broaden_d1energy(x))
 
@@ -269,13 +274,21 @@ def identify_triggers(hits):
     """
     import matplotlib.pyplot as plt
 
+    # select parameters
+    d1_min = 65
+    d2_min = 600
+    tof_max = 40.7e-9
+
     def filters(event):
+        """
+        Goes through each event and determines whether or not it is a hit.
+        """
 
         idx = event.index.get_level_values('DetectorID')
 
         good_path = idx.isin(d1).sum() == 1 and idx.isin(d2).sum() == 1
-        energy_thrshld = all(event.Energy[idx.isin(d1)] > 65) and all(
-                    event.Energy[idx.isin(d2)] > 600)
+        energy_thrshld = all(event.Energy[idx.isin(d1)] > d1_min) and all(
+                    event.Energy[idx.isin(d2)] > d2_min)
 
         if good_path:
             global tof
@@ -283,7 +296,7 @@ def identify_triggers(hits):
                     event.ElapsedTime[idx.isin(d1)].values)
             tof = np.random.normal(tof, 1e-9)
 
-            if energy_thrshld and (0 < tof < 40.7e-9):
+            if energy_thrshld and (0 < tof < tof_max):
                 pass
             else:
                 return False

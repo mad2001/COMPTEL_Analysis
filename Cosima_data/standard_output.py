@@ -6,6 +6,7 @@ Author: Morgan A. Daly
 """
 
 import os
+import glob
 import pandas as pd
 from .readsimfile import pull_simdata
 from . import transform_data as tr
@@ -34,11 +35,12 @@ def standard_output(sim_files):
 
     if os.path.isdir(sim_files):
 
-        files = os.listdir(sim_files)
-        data = pull_simdata(files[0])
+        for file in glob.iglob(sim_files+'/*[0-9]{1,4}MeV*.sim'):
 
-        sim_data = data['data']
-        particle_count = data['particle count']
+            data = pull_simdata(file)
+
+            sim_data = data['data']
+            particle_count = data['particle count']
 
 
         incident_energy = data['incident energy']
