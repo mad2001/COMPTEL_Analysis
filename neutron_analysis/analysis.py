@@ -65,7 +65,6 @@ def energy_res(data):
     # convert to keV
     E_n = E_n / (eV * kilo)
 
-
     plt.hist((E_n + data['D1Energy'].values), bins=20, range=(0, 20000))
     plt.ylabel('counts')
     plt.xlabel('Energy (keV)')
@@ -97,7 +96,7 @@ def angular_res(data, inplace=False):
     phi_scttrd = 360 - arctan(b / a)
 
     phi_geo = arccos(cos(theta_scttrd) * cos(theta_src) + sin(theta_scttrd)
-                * sin(theta_src) * cos(phi_scttrd - phi_src))
+                     * sin(theta_src) * cos(phi_scttrd - phi_src))
 
     if inplace:
         data['NeutronKE'] = E_n

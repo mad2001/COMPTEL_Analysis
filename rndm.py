@@ -25,13 +25,9 @@ import summer_research.neutron_analysis.analysis as ay
 #    eff = efficiency(efficiency_data, plot=True)
 
 
-
-
-
 if __name__ == '__main__':
     filename = "summer_research/Cosima_data/COMPTELeffA_22MeV.inc1.id1.sim"
     data = standard_output.standard(filename)
     efficiency_data = [data['incident energy'], data['particle count'], data['triggered']]
     eff = ay.efficiency(efficiency_data, plot=True)
     output = ay.angular_res(data['hits'], inplace=True)
-

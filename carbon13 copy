@@ -1,0 +1,26 @@
+
+Version 1.1
+
+Geometry /Users/morgan/Documents/MEGAlib_Tests/Geometry_Files/carbon13.geo.setup
+
+PhysicsListEM Livermore-Pol
+PhysicsListHD QGSP-BERT-HP
+
+StoreSimulationInfo true
+StoreCalibrated true
+StoreScientific true 6
+StoreSimulationInfoIonization false
+DiscretizeHits true
+
+Run testing
+testing.FileName carbon13_6MeV
+testing.Triggers 10000
+
+testing.Source neutron
+neutron.ParticleType 6
+neutron.Spectrum Mono 6000
+neutron.Beam HomogeneousBeam   0     0    .5     0      0     -1     5
+//                           cyl_x cyl_y cyl_z norm_x norm_y norm_z radius
+neutron.Flux 1
+
+DefaultRangeCut .1

@@ -20,7 +20,6 @@ import pandas as pd
 
 def pull_simdata(filename):
 
-
     # compile regex needed to parse *.sim file
     event_re = re.compile(r"""
         (?<=^SE$)                 # +lookbehind "SE" on its own line
@@ -51,7 +50,6 @@ def pull_simdata(filename):
 
     # store the total number of particles started
     particle_count = particle_count_re.search(simfile).group(0)
-
 
     def make_eventarray(one_event):
         """
@@ -97,8 +95,8 @@ def pull_simdata(filename):
                 (sim_data, make_eventarray(single_event)))
     # convert to data frame
     sim_data = pd.DataFrame(sim_data,
-                        columns=['EventID', 'DetectorID', 'ElapsedTime', 'x',
-                                 'y', 'z', 'NewParticleID', 'Energy'])
+                            columns=['EventID', 'DetectorID', 'ElapsedTime',
+                                     'x', 'y', 'z', 'NewParticleID', 'Energy'])
 
     return {'data': sim_data, 'particle count': float(particle_count),
             'incident energy': sim_data.Energy[0]}
@@ -108,4 +106,3 @@ def pull_simdata(filename):
 if __name__ == '__main__':
     filename = "COMPTELeffA_22MeV.inc1.id1.sim"
     data = pull_simdata(filename)
-

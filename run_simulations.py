@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.5
 """
 Created on Tue Apr  5 20:50:52 2016
 
@@ -9,44 +9,41 @@ import os
 import subprocess
 
 
-def run_sims():
+def run_sims(full_path):
 
-    os.chdir('/Users/morgan/Documents/MEGAlib_Tests/Source_Files')
-    source_file = 'carbon13.txt'
+    # number of files to run per energy level
+    trials = 2
 
-    for i, energy in enumerate(range(1, 5, 5)):
+    # provide directory to save *.sim files
+    sim_dir = '/Volumes/MORGAN/carbon_simulation_data'
+    if not os.path.exists(sim_dir):
+        os.makedirs(sim_dir)
+    os.chdir(sim_dir)
 
-        # read source file
-        with open(source_file, 'r') as in_file:
-            lines = in_file.readlines()
+    source_dir, source_file = os.path.split(full_path)
+
+    with open(full_path, 'r') as in_file:
+        lines = in_file.readlines()
+
+    for energy in range(1, 11, 5):
 
         # change file name
-        lines[15] = 'testing.FileName c{}MeV\n'.format(energy)
-        # change energy (converts from MeV to keV)
+        lines[15] = 'testing.FileName carbon13_{}MeV\n'.format(energy)
+        # change energy (in keV instead of MeV)
         lines[20] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
 
-        with open(source_file, 'w') as out_file:
+        with open(full_path, 'w') as out_file:
             out_file.writelines(lines)
 
-        # change to external hard drive so that *.sim files will save there
-        d = '/Volumes/MORGAN/carbon_simulation_data'
-        if not os.path.exists(d):
-            os.makedirs(d)
-        os.chdir(d)
-
         # run cosima
-        subprocess.run("cosima" "filename")
+        for i in range(trials):
+            subprocess.run('cosima '+full_path,
+                           universal_newlines=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT,
+                           shell=True)
 
 
 if __name__ == '__main__':
 
-    os.chdir('/Users/morgan/Documents/MEGAlib_Tests/Source_Files')
-    print(os.getcwd())
-    source_file = 'carbon13.txt'
-
-    f = open(source_file)
-    lines = f.readlines()
-    #print(lines[3])
-    print(lines[3])
-
-    f.close()
+    run_sims('/Users/morgan/Documents/MEGAlib_Tests/Source_Files/carbon13.source')
