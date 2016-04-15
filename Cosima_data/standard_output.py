@@ -35,14 +35,10 @@ def standard_output(sim_files):
 
     if os.path.isdir(sim_files):
 
-        for file in glob.iglob(sim_files+'/*[0-9]{1,4}MeV*.sim'):
-
-            data = pull_simdata(file)
-
-            sim_data = data['data']
-            particle_count = data['particle count']
-
-
+        files = glob.iglob(sim_files+'*.sim')
+        data = pull_simdata(files[0])
+        sim_data = data['data']
+        particle_count = data['particle count']
         incident_energy = data['incident energy']
 
         # change detector ID to format that identifies detector and module
@@ -58,11 +54,9 @@ def standard_output(sim_files):
 
         for i, file in enumerate(files[1:]):
 
-
-            data = pull_simdata(file[i])
+            data = pull_simdata(file)
 
             sim_data = data['data']
-
 
             if data['incident energy'] != incident_energy:
                 print('Files in directory do not use the same neutron energy.')
@@ -82,7 +76,7 @@ def standard_output(sim_files):
 
         # concatenate all "hits" data frames in list
         hits = pd.concat(hits)
-
+        hits.to_csv('COMPTEL_dataframe_{}MeV'.format(incident_energy/1000))
 
     return {'hits': hits,
             'incident energy': incident_energy,
