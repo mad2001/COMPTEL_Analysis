@@ -12,10 +12,10 @@ import subprocess
 def run_sims(full_path):
 
     # number of files to run per energy level
-    trials = 1
+
 
     # provide directory to save *.sim files
-    sim_dir = '/Volumes/MORGAN/NE213_simulation_data'
+    sim_dir = '/Volumes/MORGAN/newCOMPTEL_simulation_data'
     if not os.path.exists(sim_dir):
         os.makedirs(sim_dir)
     os.chdir(sim_dir)
@@ -25,15 +25,43 @@ def run_sims(full_path):
     with open(full_path, 'r') as in_file:
         lines = in_file.readlines()
 
-    for energy in range(1, 21, 1):
+    for energy in range(1, 30, 2):
 
         # change file name
-        lines[13] = 'testing.FileName carbon13_{}MeV\n'.format(energy)
+        lines[16] = 'testing.FileName carbon13_{}MeV\n'.format(energy)
         # change energy (in keV instead of MeV)
-        lines[18] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
+        lines[21] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
 
         with open(full_path, 'w') as out_file:
             out_file.writelines(lines)
+
+        if energy < 10:
+            trials = 1
+        else:
+            trials = 5
+
+        # run cosima
+        for i in range(trials):
+            subprocess.run('cosima '+full_path,
+                           universal_newlines=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT,
+                           shell=True)
+
+    for energy in range(30, 110, 5):
+
+        # change file name
+        lines[16] = 'testing.FileName finalCOMPTEL_{}MeV\n'.format(energy)
+        # change energy (in keV instead of MeV)
+        lines[21] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
+
+        with open(full_path, 'w') as out_file:
+            out_file.writelines(lines)
+
+        if energy < 10:
+            trials = 1
+        else:
+            trials = 5
 
         # run cosima
         for i in range(trials):
@@ -45,5 +73,5 @@ def run_sims(full_path):
 
 
 if __name__ == '__main__':
-    d = '/Users/morgan/Documents/MEGAlib_Tests/COMPTEL_material_tests/test_NE213.source'
+    d = '/Users/morgan/Documents/COMTPEL/COMPTELpractice.source'
     run_sims(d)
