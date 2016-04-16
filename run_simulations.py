@@ -28,7 +28,7 @@ def run_sims(full_path):
     for energy in range(1, 30, 2):
 
         # change file name
-        lines[16] = 'testing.FileName carbon13_{}MeV\n'.format(energy)
+        lines[16] = 'CollectData.FileName carbon13_{}MeV\n'.format(energy)
         # change energy (in keV instead of MeV)
         lines[21] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
 
@@ -51,7 +51,7 @@ def run_sims(full_path):
     for energy in range(30, 110, 5):
 
         # change file name
-        lines[16] = 'testing.FileName finalCOMPTEL_{}MeV\n'.format(energy)
+        lines[16] = 'CollectData.FileName finalCOMPTEL_{}MeV\n'.format(energy)
         # change energy (in keV instead of MeV)
         lines[21] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
 
