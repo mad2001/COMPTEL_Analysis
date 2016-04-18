@@ -9,6 +9,8 @@ Author: Morgan A. Daly
 
 """
 
+from scipy.stats import norm
+import matplotlib.mlab as mlab
 import numpy as np
 from numpy import sqrt, sin, cos, tan, arccos, arctan
 from scipy.constants import pi, m_n, kilo, eV
@@ -60,21 +62,35 @@ def energy_res(data):
                                data[['x_1', 'y_1', 'z_1']].values, axis=1)) * .01
     print(distance)
 
-    # calculate classical kinetic energy
+    # calculate classical kinetic energy in joules
     E_n = .5 * m_n * ((distance / data['TimeOfFlight'].values) ** 2)
     # convert to keV
     E_n = E_n / (eV * kilo)
+    tot_energy = E_n + data['D1Energy'].values
 
-    plt.hist((E_n + data['D1Energy'].values), bins=20, range=(0, 20000))
-    plt.ylabel('counts')
-    plt.xlabel('Energy (keV)')
-    plt.title('Energy Resolution')
-    plt.show()
+    if plot:
+        # best fit of data
+        (mu, sigma) = norm.fit(tot_energy)
+
+       # the histogram of the data
+        n, bins, patches = plt.hist(tot_energy, bins=30, facecolor='blue')
+
+        # add a 'best fit' line
+        y = mlab.normpdf( bins, mu, sigma)
+        l = plt.plot(bins, y, 'r--', linewidth=2)
+
+        #plot
+        plt.xlabel('Energy (keV)')
+        plt.ylabel('Counts')
+        plt.title(r'$\mathrm{\Energy \Spectrum:}\ \mu=%.3f,\ \sigma=%.3f$' %(mu, sigma))
+        plt.grid(True)
+
+        plt.show()
 
     return E_n
 
 
-def angular_res(data, inplace=False):
+def angular_res(data, inplace=False, plot=False):
 
     phi_src = 0
     theta_src = 0
@@ -102,5 +118,27 @@ def angular_res(data, inplace=False):
         data['NeutronKE'] = E_n
         data['arm'] = phi_measured - phi_geo
         return data
+
+    if plot:
+        # best fit of data
+        (mu, sigma) = norm.fit(data['arm'])
+
+       # the histogram of the data
+        n, bins, patches = plt.hist(data['arm'], bins=25, facecolor='blue')
+
+        # add a 'best fit' line
+        y = mlab.normpdf( bins, mu, sigma)
+        l = plt.plot(bins, y, 'r--', linewidth=2)
+
+        #plot
+        plt.xlabel('Energy (MeV)')
+        plt.ylabel('Counts')
+        plt.title(r'$\mathrm{ARM:}\ \mu=%.3f,\ \sigma=%.3f$' %(mu, sigma))
+        plt.grid(True)
+
+        plt.show()
+
     else:
         return phi_measured - phi_geo
+
+def energy_s

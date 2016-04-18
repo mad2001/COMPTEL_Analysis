@@ -35,7 +35,7 @@ def standard_output(sim_files):
 
     if os.path.isdir(sim_files):
 
-        files = glob.iglob(sim_files+'*.sim')
+        files = glob.glob(sim_files+'*.sim')
         data = pull_simdata(files[0])
         sim_data = data['data']
         particle_count = data['particle count']

@@ -25,20 +25,16 @@ def run_sims(full_path):
     with open(full_path, 'r') as in_file:
         lines = in_file.readlines()
 
-    for energy in range(1, 30, 2):
-
+    for energy in [17, 35, 77]:
         # change file name
-        lines[16] = 'CollectData.FileName carbon13_{}MeV\n'.format(energy)
+        lines[16] = 'CollectData.FileName COMPTELdata_{}MeV\n'.format(energy)
         # change energy (in keV instead of MeV)
         lines[21] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
 
         with open(full_path, 'w') as out_file:
             out_file.writelines(lines)
 
-        if energy < 10:
-            trials = 1
-        else:
-            trials = 5
+        trials = 2
 
         # run cosima
         for i in range(trials):
@@ -48,28 +44,28 @@ def run_sims(full_path):
                            stderr=subprocess.STDOUT,
                            shell=True)
 
-    for energy in range(30, 110, 5):
-
-        # change file name
-        lines[16] = 'CollectData.FileName finalCOMPTEL_{}MeV\n'.format(energy)
-        # change energy (in keV instead of MeV)
-        lines[21] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
-
-        with open(full_path, 'w') as out_file:
-            out_file.writelines(lines)
-
-        if energy < 10:
-            trials = 1
-        else:
-            trials = 5
-
-        # run cosima
-        for i in range(trials):
-            subprocess.run('cosima '+full_path,
-                           universal_newlines=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.STDOUT,
-                           shell=True)
+#    for energy in range(30, 110, 5):
+#
+#        # change file name
+#        lines[16] = 'CollectData.FileName finalCOMPTEL_{}MeV\n'.format(energy)
+#        # change energy (in keV instead of MeV)
+#        lines[21] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
+#
+#        with open(full_path, 'w') as out_file:
+#            out_file.writelines(lines)
+#
+#        if energy < 10:
+#            trials = 1
+#        else:
+#            trials = 5
+#
+#        # run cosima
+#        for i in range(trials):
+#            subprocess.run('cosima '+full_path,
+#                           universal_newlines=True,
+#                           stdout=subprocess.PIPE,
+#                           stderr=subprocess.STDOUT,
+#                           shell=True)
 
 
 if __name__ == '__main__':
