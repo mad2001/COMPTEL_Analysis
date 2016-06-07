@@ -1,8 +1,10 @@
 #!/usr/bin/env python3.5
 """
-Created on Tue Apr  5 20:50:52 2016
+Created on Tue Apr 5 20:50:52 2016
 
 @author: Morgan
+
+Script runs sets of simulations at once.
 """
 
 import os

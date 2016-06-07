@@ -43,9 +43,10 @@ def pull_simdata(filename):
         (\d+?$)                     # capture number
         """, re.X | re.MULTILINE)
 
-    # create list of all events as strings
     with open(filename, 'r') as fh:
         simfile = fh.read()
+
+    # create list of all events as strings
     all_events = event_re.findall(simfile)
 
     # store the total number of particles started
