@@ -8,8 +8,9 @@ Author: Morgan A. Daly
 import os
 import glob
 import pandas as pd
-from .readsimfile import pull_simdata
-from . import transform_data as tr
+
+from .Cosima_data.readsimfile import pull_simdata
+from .Cosima_data import transform_data as tr
 
 
 def standard_output(sim_files):

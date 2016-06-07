@@ -22,14 +22,15 @@ def efficiency(data, plot=False):
     simulated_particles = data[:, 1]
     triggered = data[:, 2]
 
-    # measurements from simulation geometry files
-    s = 16         # number of sides of scintillator's polygon volume
-    R = 13.47      # apothem of scintillator's polygon volume
-    r = 250        # radius of "surrounding sphere"
-    # calculate geometric area of detector (here, area of D1 scintillators)
-    detector_area = R**2 * s * tan(pi / s) * 7
-    # calculate area from which neutrons are being started
-    start_area = pi * r**2
+    detector_area = 4042.1739633515281
+        # 7 D1 scintillators
+        # modeled as 16 sided polygons with an apothem of 13.47
+        # detector area comes from (13.47^2)(16)(tan(pi/16))
+
+    surrounding_sphere_radius = 250
+    start_area = pi * surrounding_sphere_radius**2
+
+
     # calculate effective area of COMPTEL for neutrons
     effective_area = start_area * (triggered / simulated_particles)
 
@@ -72,7 +73,7 @@ def energy_res(data):
         # best fit of data
         (mu, sigma) = norm.fit(tot_energy)
 
-       # the histogram of the data
+        # the histogram of the data
         n, bins, patches = plt.hist(tot_energy, bins=30, facecolor='blue')
 
         # add a 'best fit' line
@@ -140,5 +141,3 @@ def angular_res(data, inplace=False, plot=False):
 
     else:
         return phi_measured - phi_geo
-
-def energy_s

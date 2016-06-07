@@ -11,65 +11,51 @@ import os
 import subprocess
 
 
-def run_sims(full_path):
+def run_sims():
+    """
+     Automates the running of Cosima simulations.
 
-    # number of files to run per energy level
+     Written more like a script than a function, it required the adjustment
+     of parameters before use.
 
+     source_file_path :: the full path to the Cosima source file that will be
+                         used for simulations
+     sim_dir :: the full path to the directory where *.sim files will be saved
+     trials :: the number of simulations to run for each energy level
+     energy_range :: an iterable the energy levels to simulate
+    """
 
-    # provide directory to save *.sim files
+    source_file_path = '/Some/Path/Name'
     sim_dir = '/Volumes/MORGAN/newCOMPTEL_simulation_data'
+    trials = 2
+    energy_range = [1, 4, 53]
+
     if not os.path.exists(sim_dir):
         os.makedirs(sim_dir)
     os.chdir(sim_dir)
 
-    source_dir, source_file = os.path.split(full_path)
+    source_dir, source_file = os.path.split(source_file_path)
 
-    with open(full_path, 'r') as in_file:
+    with open(source_file_path, 'r') as in_file:
         lines = in_file.readlines()
 
-    for energy in [17, 35, 77]:
+    for energy in energy_range:
         # change file name
         lines[16] = 'CollectData.FileName COMPTELdata_{}MeV\n'.format(energy)
         # change energy (in keV instead of MeV)
         lines[21] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
 
-        with open(full_path, 'w') as out_file:
+        with open(source_file_path, 'w') as out_file:
             out_file.writelines(lines)
-
-        trials = 2
 
         # run cosima
         for i in range(trials):
-            subprocess.run('cosima '+full_path,
+            subprocess.run('cosima '+source_file_path,
                            universal_newlines=True,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.STDOUT,
                            shell=True)
 
-#    for energy in range(30, 110, 5):
-#
-#        # change file name
-#        lines[16] = 'CollectData.FileName finalCOMPTEL_{}MeV\n'.format(energy)
-#        # change energy (in keV instead of MeV)
-#        lines[21] = 'neutron.Spectrum Mono {}\n'.format(energy*1000)
-#
-#        with open(full_path, 'w') as out_file:
-#            out_file.writelines(lines)
-#
-#        if energy < 10:
-#            trials = 1
-#        else:
-#            trials = 5
-#
-#        # run cosima
-#        for i in range(trials):
-#            subprocess.run('cosima '+full_path,
-#                           universal_newlines=True,
-#                           stdout=subprocess.PIPE,
-#                           stderr=subprocess.STDOUT,
-#                           shell=True)
-
 
 if __name__ == '__main__':
-    d = '/Users/morgan/Documents/COMTPEL/COMPTELpractice.source'
-    run_sims(d)
+    run_sims()
