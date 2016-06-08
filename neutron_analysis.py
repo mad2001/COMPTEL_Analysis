@@ -12,15 +12,12 @@ Author: Morgan A. Daly
 from scipy.stats import norm
 import matplotlib.mlab as mlab
 import numpy as np
-from numpy import sqrt, sin, cos, tan, arccos, arctan
+from numpy import sqrt, sin, cos, arccos, arctan
 from scipy.constants import pi, m_n, kilo, eV
 import matplotlib.pyplot as plt
 
 
 def efficiency(data, plot=False):
-
-    simulated_particles = data[:, 1]
-    triggered = data[:, 2]
 
     detector_area = 4042.1739633515281
         # 7 D1 scintillators
@@ -30,9 +27,8 @@ def efficiency(data, plot=False):
     surrounding_sphere_radius = 250
     start_area = pi * surrounding_sphere_radius**2
 
-
     # calculate effective area of COMPTEL for neutrons
-    effective_area = start_area * (triggered / simulated_particles)
+    effective_area = start_area * (data.triggered_events / data.particle_count)
 
     # calculate detector efficiency
     efficiency = (effective_area / detector_area)*100
@@ -56,12 +52,11 @@ def efficiency(data, plot=False):
     return efficiency
 
 
-def energy_res(data):
+def energy_res(data, plot=False):
 
     # normal vector from point in D1 to point in D2
-    distance = (np.linalg.norm(data[['x_2', 'y_2', 'z_2']].values -
-                               data[['x_1', 'y_1', 'z_1']].values, axis=1)) * .01
-    print(distance)
+    distance = (np.linalg.norm(data.hits[['x_2', 'y_2', 'z_2']].values -
+                               data.hits[['x_1', 'y_1', 'z_1']].values, axis=1)) * .01
 
     # calculate classical kinetic energy in joules
     E_n = .5 * m_n * ((distance / data['TimeOfFlight'].values) ** 2)

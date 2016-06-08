@@ -7,13 +7,30 @@ Author: Morgan A. Daly
 
 import os
 import glob
+import pickle
 import pandas as pd
 
 from .Cosima_data.readsimfile import pull_simdata
 from .Cosima_data import transform_data as tr
 
 
+class Data:
+    """
+    Class designed to contain all of the information about the processed
+    simulation.
+    """
+
+    def __init__(self, hits, particle_count, incident_energy):
+         self.hits = hits
+         self.particle_count = particle_count
+         self.incident_energy = incident_energy
+         self.triggered_events = len(hits.index)
+
+
 def standard_output(sim_files):
+    """
+    Creates the Hits object, then saves it in a directory.
+    """
 
     if os.path.isfile(sim_files):
         # convert *.sim file to Pandas data frame
@@ -29,10 +46,13 @@ def standard_output(sim_files):
         # convert to electron equivalent
         sim_data['Energy'] = sim_data.apply(tr.electron_equivalent, axis=1)
 
-        hits = tr.create_hits(sim_data)
-        hits = tr.broaden(hits)
+        hits_df = tr.create_hits(sim_data)
+        hits_df = tr.broaden(hits_df)
         #hits.plot(x='x', y='y', kind='scatter')
-        hits = tr.identify_triggers(hits)
+        hits_df = tr.identify_triggers(hits_df)
+
+        # convert into the "hits" object
+        data = Data(hits_df, particle_count, incident_energy)
 
     if os.path.isdir(sim_files):
 
@@ -54,11 +74,10 @@ def standard_output(sim_files):
         hits = [tr.identify_triggers(hits)]
 
         for i, file in enumerate(files[1:]):
-
             data = pull_simdata(file)
-
             sim_data = data['data']
 
+            # error catching
             if data['incident energy'] != incident_energy:
                 print('Files in directory do not use the same neutron energy.')
 
@@ -76,12 +95,11 @@ def standard_output(sim_files):
             hits.append(tr.identify_triggers(temp_hits))
 
         # concatenate all "hits" data frames in list
-        hits = pd.concat(hits)
-        hits.to_csv('COMPTEL_dataframe_{}MeV'.format(incident_energy/1000))
+        hits_df = pd.concat(hits)
+        # convert into the "Hits" object
+        data = Data(hits_df, particle_count, incident_energy)
 
-    return {'hits': hits,
-            'incident energy': incident_energy,
-            'particle count': particle_count,
-            'triggered': len(hits.index)}
+    #hits.to_csv('COMPTEL_dataframe_{}MeV'.format(incident_energy/1000))
+    pickle.dump(data, 'COMPTEL_{}MeV'.format(incident_energy/1000), protocol=-1)
 
 # current wall time: 15.6 s

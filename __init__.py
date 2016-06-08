@@ -6,4 +6,4 @@ Created on Sat Aug  8 13:29:30 2015
 """
 
 
-__all__ = ["Cosima_data", "neutron_analysis"]
+__all__ = ["analyze_data", "neutron_analysis", "process_sim_files", "run_simulations"]
