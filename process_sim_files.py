@@ -30,6 +30,10 @@ class Data:
 def standard_output(sim_files):
     """
     Creates the Hits object, then saves it in a directory.
+
+    Input is the full path to a Cosima simulation file, or a directory
+    containing Cosima simulation files. If a directory is provided, all *.sim
+    files should be from simulations of the same incident energy.
     """
 
     if os.path.isfile(sim_files):
@@ -100,6 +104,7 @@ def standard_output(sim_files):
         data = Data(hits_df, particle_count, incident_energy)
 
     #hits.to_csv('COMPTEL_dataframe_{}MeV'.format(incident_energy/1000))
-    pickle.dump(data, 'COMPTEL_{}MeV'.format(incident_energy/1000), protocol=-1)
+    with open('COMPTEL_{}MeV'.format(incident_energy/1000), 'wb') as f:
+        pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
 # current wall time: 15.6 s

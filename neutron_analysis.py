@@ -52,7 +52,7 @@ def efficiency(data, plot=False):
     return efficiency
 
 
-def energy_res(data, plot=False):
+def energy_dist(data, plot=False):
 
     # normal vector from point in D1 to point in D2
     distance = (np.linalg.norm(data.hits[['x_2', 'y_2', 'z_2']].values -
