@@ -17,7 +17,7 @@ from scipy.constants import pi, m_n, kilo, eV
 import matplotlib.pyplot as plt
 
 
-def efficiency(data, plot=False):
+def efficiency(data):
 
     detector_area = 4042.1739633515281
         # 7 D1 scintillators
@@ -52,7 +52,42 @@ def efficiency(data, plot=False):
     return efficiency
 
 
-def energy_dist(data, plot=False):
+def angular_res(data):
+
+    phi_src = 0
+    theta_src = 0
+
+    distance = np.linalg.norm(data[['x_2', 'y_2', 'z_2']].values -
+                              data[['x_1', 'y_1', 'z_1']].values, axis=1)
+
+    # calculate classical kinetic energy
+    E_n = .5 * m_n * (distance / data['TimeOfFlight'].values)
+
+    # measured scattered angle derived from n-p scattering kinematics
+    phi_measured = arccos(sqrt(data['D1Energy'].values * eV / (E_n * kilo)))
+
+    # calculate geometric scatter angle
+    a = (data['x_1'] - data['x_2']) / distance
+    b = (data['y_1'] - data['y_2']) / distance
+    c = (data['z_2'] - data['z_1']) / distance
+    theta_scttrd = arccos(c)
+    phi_scttrd = 360 - arctan(b / a)
+
+    phi_geo = arccos(cos(theta_scttrd) * cos(theta_src) + sin(theta_scttrd)
+                     * sin(theta_src) * cos(phi_scttrd - phi_src))
+
+    if inplace:
+        data['NeutronKE'] = E_n
+        data['arm'] = phi_measured - phi_geo
+        return data
+
+
+
+    else:
+        return phi_measured - phi_geo
+
+
+def energy_spectrum(data):
 
     # normal vector from point in D1 to point in D2
     distance = (np.linalg.norm(data.hits[['x_2', 'y_2', 'z_2']].values -
@@ -86,53 +121,26 @@ def energy_dist(data, plot=False):
     return E_n
 
 
-def angular_res(data, inplace=False, plot=False):
+def eff_vs_energy(energy, eff):
+    stuff
 
-    phi_src = 0
-    theta_src = 0
 
-    distance = np.linalg.norm(data[['x_2', 'y_2', 'z_2']].values -
-                              data[['x_1', 'y_1', 'z_1']].values, axis=1)
+def arm_vs_energy(energy, arm):
 
-    # calculate classical kinetic energy
-    E_n = .5 * m_n * (distance / data['TimeOfFlight'].values)
+    # best fit of data
+    (mu, sigma) = norm.fit(data['arm'])
 
-    # measured scattered angle derived from n-p scattering kinematics
-    phi_measured = arccos(sqrt(data['D1Energy'].values * eV / (E_n * kilo)))
+    # the histogram of the data
+    n, bins, patches = plt.hist(data['arm'], bins=25, facecolor='blue')
 
-    # calculate geometric scatter angle
-    a = (data['x_1'] - data['x_2']) / distance
-    b = (data['y_1'] - data['y_2']) / distance
-    c = (data['z_2'] - data['z_1']) / distance
-    theta_scttrd = arccos(c)
-    phi_scttrd = 360 - arctan(b / a)
+    # add a 'best fit' line
+    y = mlab.normpdf( bins, mu, sigma)
+    l = plt.plot(bins, y, 'r--', linewidth=2)
 
-    phi_geo = arccos(cos(theta_scttrd) * cos(theta_src) + sin(theta_scttrd)
-                     * sin(theta_src) * cos(phi_scttrd - phi_src))
+    #plot
+    plt.xlabel('Energy (MeV)')
+    plt.ylabel('Counts')
+    plt.title(r'$\mathrm{ARM:}\ \mu=%.3f,\ \sigma=%.3f$' %(mu, sigma))
+    plt.grid(True)
 
-    if inplace:
-        data['NeutronKE'] = E_n
-        data['arm'] = phi_measured - phi_geo
-        return data
-
-    if plot:
-        # best fit of data
-        (mu, sigma) = norm.fit(data['arm'])
-
-       # the histogram of the data
-        n, bins, patches = plt.hist(data['arm'], bins=25, facecolor='blue')
-
-        # add a 'best fit' line
-        y = mlab.normpdf( bins, mu, sigma)
-        l = plt.plot(bins, y, 'r--', linewidth=2)
-
-        #plot
-        plt.xlabel('Energy (MeV)')
-        plt.ylabel('Counts')
-        plt.title(r'$\mathrm{ARM:}\ \mu=%.3f,\ \sigma=%.3f$' %(mu, sigma))
-        plt.grid(True)
-
-        plt.show()
-
-    else:
-        return phi_measured - phi_geo
+    plt.show()
