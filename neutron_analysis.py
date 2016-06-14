@@ -33,22 +33,6 @@ def efficiency(data):
     # calculate detector efficiency
     efficiency = (effective_area / detector_area)*100
 
-    # O'Neill efficiency data
-    comp_energy = [17.2, 22, 35.7, 77]
-    comp_eff = [.127, .144, .08, .053]
-    err = [.005, .006, .004, .004]
-
-    if plot:
-        energy = data[:, 0]
-        plt.plot((energy / 1000), efficiency, marker='o', linestyle='None')
-        plt.hold(True)
-        plt.errorbar(comp_energy, comp_eff, yerr=err, fmt='.')
-        plt.ylabel('Efficiency (%)')
-        plt.xlabel('Energy (MeV)')
-        plt.title('Detector Efficiency')
-        plt.grid(True)
-        plt.show()
-
     return efficiency
 
 
@@ -81,8 +65,6 @@ def angular_res(data):
         data['arm'] = phi_measured - phi_geo
         return data
 
-
-
     else:
         return phi_measured - phi_geo
 
@@ -99,36 +81,48 @@ def energy_spectrum(data):
     E_n = E_n / (eV * kilo)
     tot_energy = E_n + data['D1Energy'].values
 
-    if plot:
-        # best fit of data
-        (mu, sigma) = norm.fit(tot_energy)
+    # best fit of data
+    (mu, sigma) = norm.fit(tot_energy)
 
-        # the histogram of the data
-        n, bins, patches = plt.hist(tot_energy, bins=30, facecolor='blue')
+    # the histogram of the data
+    n, bins, patches = plt.hist(tot_energy, bins=30, facecolor='blue')
 
-        # add a 'best fit' line
-        y = mlab.normpdf( bins, mu, sigma)
-        l = plt.plot(bins, y, 'r--', linewidth=2)
+    # add a 'best fit' line
+    y = mlab.normpdf( bins, mu, sigma)
+    l = plt.plot(bins, y, 'r--', linewidth=2)
 
-        #plot
-        plt.xlabel('Energy (keV)')
-        plt.ylabel('Counts')
-        plt.title(r'$\mathrm{\Energy \Spectrum:}\ \mu=%.3f,\ \sigma=%.3f$' %(mu, sigma))
-        plt.grid(True)
+    #plot
+    plt.xlabel('Energy (keV)')
+    plt.ylabel('Counts')
+    plt.title(r'$\mathrm{\Energy \Spectrum:}\ \mu=%.3f,\ \sigma=%.3f$' %(mu, sigma))
+    plt.grid(True)
 
-        plt.show()
+    plt.show()
 
     return E_n
 
 
 def eff_vs_energy(energy, eff):
-    stuff
+    # O'Neill efficiency data
+    comp_energy = [17.2, 22, 35.7, 77]
+    comp_eff = [.127, .144, .08, .053]
+    err = [.005, .006, .004, .004]
+
+    energy = data[:, 0]
+    plt.plot((energy / 1000), efficiency, marker='o', linestyle='None')
+    plt.hold(True)
+    plt.errorbar(comp_energy, comp_eff, yerr=err, fmt='.')
+    plt.ylabel('Efficiency (%)')
+    plt.xlabel('Energy (MeV)')
+    plt.title('Detector Efficiency')
+    plt.grid(True)
+    plt.show()
 
 
 def arm_vs_energy(energy, arm):
 
     # best fit of data
-    (mu, sigma) = norm.fit(data['arm'])
+    mu, sigma = norm.fit(arm)
 
     # the histogram of the data
     n, bins, patches = plt.hist(data['arm'], bins=25, facecolor='blue')
