@@ -1,8 +1,7 @@
 #!/usr/bin/env python3.5
 """
 Created on Tue Apr 5 20:50:52 2016
-
-@author: Morgan
+Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 
 Script runs sets of simulations at once.
 """
@@ -37,6 +36,7 @@ def run_sims():
     source_dir, source_file = os.path.split(source_file_path)
 
     with open(source_file_path, 'r') as in_file:
+        # creates a list with each line as an element
         lines = in_file.readlines()
 
     for energy in energy_range:

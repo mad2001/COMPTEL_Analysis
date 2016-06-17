@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created: Mon Jul 27 12:17:44 2015
-
-Author: Morgan A. Daly
+Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 """
 
 import math
@@ -46,4 +45,3 @@ plt.title('Electron Equivalent Energy')
 plt.legend(['Protons in NE-213', 'Protons in NE-102', 'Alpha Particles'])
 plt.grid(True)
 plt.show()
-

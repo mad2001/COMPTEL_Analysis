@@ -2,8 +2,7 @@
 
 """
 Created: Summer 2015
-Author: Morgan A. Daly
-
+Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 
 This module defines all necessary volumes for COMPTEL simulation data
 analysis. The positions and measurements used are those in the input file

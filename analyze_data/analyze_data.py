@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jun  7 15:50:01 2016
-
-@author: Morgan
+Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 """
 
 import os

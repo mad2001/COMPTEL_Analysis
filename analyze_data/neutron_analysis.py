@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created: Thu Jul 30 11:25:55 2015
-
-Author: Morgan A. Daly
-
+Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 
 @todo WRITE DOCSTRINGS
 

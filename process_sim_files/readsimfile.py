@@ -2,8 +2,7 @@
 
 """
 Created: Tue Jul  7 13:08:07 2015
-
-Author: Morgan A. Daly
+Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 
 
 This module contains functions to parse the text file output from Cosima,

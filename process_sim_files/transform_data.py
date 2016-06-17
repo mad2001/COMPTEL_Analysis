@@ -3,8 +3,7 @@
 
 """
 Created: Fri Jun 26 11:31:42 2015
-
-Author: Morgan A. Daly
+Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 
 
 Data from simulation is transformed into detector output format.
@@ -333,4 +332,3 @@ def identify_triggers(hits):
              'x_2': d2_data.x.values, 'y_2': d2_data.y.values, 'z_2': d2_data.z.values,
              'TimeOfFlight': tof
              }).reset_index(level='DetectorID', drop=True)
-
