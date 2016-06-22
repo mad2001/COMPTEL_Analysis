@@ -1,16 +1,12 @@
-# -*- coding: utf-8 -*-
-
-"""
-Created: Tue Jul  7 13:08:07 2015
-Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
-
+"""Parse a *.sim file and store useful data in a ndarray.
 
 This module contains functions to parse the text file output from Cosima,
 a Geant4 interface in the MEGAlib package.
 Important data is organized into a ndarray to allow for further analysis.
 
+Created: Tue Jul  7 13:08:07 2015
+Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 """
-
 import re
 
 import numpy as np
@@ -48,12 +44,22 @@ def pull_simdata(filename):
     # create list of all events as strings
     all_events = event_re.findall(simfile)
 
-    # store the total number of particles started
+    # store the total number of incident particles
     particle_count = particle_count_re.search(simfile).group(0)
 
     def make_eventarray(one_event):
-        """
-        Creates a single array containing both the event and interaction data.
+        """Create a single array containing the event and interaction data.
+
+           Converts the string containing event data into an ndarray. The array
+           is formatted as shown below:
+           ---------------------------------------------------------------------------------------
+           |EventID||InteractionID||DetectorID||Elapsed Time||  x  ||  y  ||   z  ||ParticleID||KineticEnergy|
+           ---------------------------------------------------------------------------------------
+           |      2||            1||         4||1.3260586163205e-08||3.714457e+01||4.643816e+01||9.823007e+01||||7.273874e+03|
+           |      2||            2||         4||1.3260586163205e-08||Position||ParticleID||KineticEnergy|
+           |      2||            3||         7||6.6481169758581e-08||Position||ParticleID||KineticEnergy|
+           |      2||            4||         1||1.9123091186759e-07||Position||ParticleID||KineticEnergy|
+
 
         Effectively, it adds the corresponding event data to the beginning of
         each row of the interaction array in order to combine the information.
@@ -66,26 +72,26 @@ def pull_simdata(filename):
         Returns
         --------
             a (# interactions, 9) ndarray of all data for a single event
-
         """
-        # convert the values in the strings to numbers
+        # pull event id number from string and convert it to a float
         event_id = float(event_values_re.search(one_event).group('event_id'))
 
-        # create empty ndarray to store data
+        # create empty ndarray (one row per interaction, 8 columns)
         interaction_data = np.empty([len(interactions_re.findall(one_event)), 8])
-        # store values
+
+        # assign event_id to interactions in event
         interaction_data[:, 0] = event_id
+
+        # fill in the rest of the interaction data
         for i, interaction in enumerate(interactions_re.finditer(one_event)):
-            # turn string of data values into ndarray
+            # turn string of interaction data into ndarray
             all_data = np.fromstring(interaction.group('ia'), count=23, sep=';')
-            # store the relevant values
-            #   (interaction ID, detector ID, elapsed time, position, particle
-            #    ID, kinetic energy)
+            # store interaction ID, detector ID, elapsed time, x, y, z,
+            #    particle ID, and kinetic energy)
+            #@NOTE changed particle ID from element 15 to element 7 (from "new particle" to "incident particle")
             interaction_data[i, 1:] = (np.array(
-                        all_data[[2, 3, 4, 5, 6, 15, 22]]))
-
+                                       all_data[[2, 3, 4, 5, 6, 7, 22]]))
         return interaction_data
-
 
     # build ndarray of data for all events
     sim_data = make_eventarray(all_events[0])

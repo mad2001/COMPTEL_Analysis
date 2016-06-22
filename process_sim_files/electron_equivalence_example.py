@@ -3,13 +3,12 @@
 Created: Mon Jul 27 12:17:44 2015
 Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 """
-
 import math
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-T_e = lambda x: a_1 * x - a_2 * (1.0 - math.exp( -a_3 * x**a_4 ))
+T_e = lambda x: a_1 * x - a_2 * (1.0 - math.exp(-a_3 * x**a_4))
 
 energy = np.arange(0.25, 10, .1)
 
@@ -37,7 +36,7 @@ a_4 = 1.01
 
 E_3 = np.array([T_e(x) for x in energy])
 
-plt.loglog(energy, E_1, 'g',  energy, E_2, 'b', energy, E_3, 'r')
+plt.loglog(energy, E_1, 'g', energy, E_2, 'b', energy, E_3, 'r')
 plt.xlim(0.25, 10)
 plt.ylabel('Electron Equivalent Energy (MeV)')
 plt.xlabel('Particle Kinetic Energy (MeV)')
