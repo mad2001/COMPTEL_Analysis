@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.5
 """Parse a *.sim file and store useful data in a ndarray.
 
 This module contains functions to parse the text file output from Cosima,
@@ -14,7 +15,21 @@ import pandas as pd
 
 
 def pull_simdata(filename):
+    """Store data from a *.sim file as a pandas dataframe.
 
+    Parameters
+    ----------
+        filename -- the path to the *.sim file being parsed
+
+    Returns
+    -------
+        a dictionary containing three elements:
+            data -- a pandas dataframe containing 'EventID', 'DetectorID',
+                    'ElapsedTime', 'x', 'y', 'z', 'NewParticleID', 'Energy' for
+                    each interaction in the event
+            particle count -- total number of incident particles simulated
+            incident energy -- incident particle energy being simulated
+    """
     # compile regex needed to parse *.sim file
     event_re = re.compile(r"""
         (?<=^SE$)                 # +lookbehind "SE" on its own line
@@ -50,27 +65,19 @@ def pull_simdata(filename):
     def make_eventarray(one_event):
         """Create a single array containing the event and interaction data.
 
-           Converts the string containing event data into an ndarray. The array
-           is formatted as shown below:
-           ---------------------------------------------------------------------------------------
-           |EventID||InteractionID||DetectorID||Elapsed Time||  x  ||  y  ||   z  ||ParticleID||KineticEnergy|
-           ---------------------------------------------------------------------------------------
-           |      2||            1||         4||1.3260586163205e-08||3.714457e+01||4.643816e+01||9.823007e+01||||7.273874e+03|
-           |      2||            2||         4||1.3260586163205e-08||Position||ParticleID||KineticEnergy|
-           |      2||            3||         7||6.6481169758581e-08||Position||ParticleID||KineticEnergy|
-           |      2||            4||         1||1.9123091186759e-07||Position||ParticleID||KineticEnergy|
-
-
-        Effectively, it adds the corresponding event data to the beginning of
-        each row of the interaction array in order to combine the information.
+        Converts the string containing event data into an ndarray. The array is
+        formatted as shown below:
+        ---------------------------------------------------------------------------------------------
+        |EventID||InteractionID||DetectorID||Elapsed Time|| x || y ||  z ||ParticleID||KineticEnergy|
+        ---------------------------------------------------------------------------------------------
 
 
         Parameters
-        ------------
+        ----------
             one_event -- an individual event string
 
         Returns
-        --------
+        -------
             a (# interactions, 9) ndarray of all data for a single event
         """
         # pull event id number from string and convert it to a float
@@ -93,12 +100,9 @@ def pull_simdata(filename):
                                        all_data[[2, 3, 4, 5, 6, 7, 22]]))
         return interaction_data
 
-    # build ndarray of data for all events
-    sim_data = make_eventarray(all_events[0])
-    for i, single_event in enumerate(all_events, 1):
-        sim_data = np.concatenate(
-                                 (sim_data, make_eventarray(single_event)))
-    # convert to data frame
+    # @NOTE this bit seems silly... make a list of ndarrays, concat to one
+    #       ndarray, then convert to datafram??
+    sim_data = np.concatenate([make_eventarray(event) for event in all_events])
     sim_data = pd.DataFrame(sim_data,
                             columns=['EventID', 'DetectorID', 'ElapsedTime',
                                      'x', 'y', 'z', 'NewParticleID', 'Energy'])
@@ -107,7 +111,19 @@ def pull_simdata(filename):
             'incident energy': sim_data.Energy[0]}
 
 
-# Wall time: 3.29 s
+# current wall time of ~4s processing of 30MB *.sim file
 if __name__ == '__main__':
-    filename = "COMPTELeffA_22MeV.inc1.id1.sim"
-    data = pull_simdata(filename)
+    import sys
+
+    data = pull_simdata(sys.argv[1])
+
+    print("\n\nSimulated {} particles at {} keV.\n".format(
+          data['particle count'], data['incident energy']))
+    print("Would you like to see all recorded data? (y/n)")
+    ans = input()
+    if ans == 'y':
+        print(data['data'])
+    elif ans == 'n':
+        print('\nExiting now.\n')
+    else:
+        print("\nYour input was something other than y or n... \nExiting now.")
