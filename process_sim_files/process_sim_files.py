@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
+"""Process the sim files.
+
 Created: Tue Jun 30 09:23:38 2015
 Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 """
@@ -14,27 +15,22 @@ from .Cosima_data import transform_data as tr
 
 
 class Data:
-    """
-    Class designed to contain all of the information about the processed
-    simulation.
-    """
+    """Class designed to contain all of the information about the processed simulation."""
 
     def __init__(self, hits, particle_count, incident_energy):
-         self.hits = hits
-         self.particle_count = particle_count
-         self.incident_energy = incident_energy
-         self.triggered_events = len(hits.index)
+        self.hits = hits
+        self.particle_count = particle_count
+        self.incident_energy = incident_energy
+        self.triggered_events = len(hits.index)
 
 
 def standard_output(sim_files):
-    """
-    Creates the Hits object, then saves it in a directory.
+    """Create the Hits object, then save it in a directory.
 
     Input is the full path to a Cosima simulation file, or a directory
     containing Cosima simulation files. If a directory is provided, all *.sim
     files should be from simulations of the same incident energy.
     """
-
     if os.path.isfile(sim_files):
         # convert *.sim file to Pandas data frame
         data = pull_simdata(sim_files)
@@ -59,7 +55,7 @@ def standard_output(sim_files):
 
     if os.path.isdir(sim_files):
 
-        files = glob.glob(sim_files+'*.sim')
+        files = glob.glob(sim_files + '*.sim')
         data = pull_simdata(files[0])
         sim_data = data['data']
         particle_count = data['particle count']
@@ -103,7 +99,7 @@ def standard_output(sim_files):
         data = Data(hits_df, particle_count, incident_energy)
 
     #hits.to_csv('COMPTEL_dataframe_{}MeV'.format(incident_energy/1000))
-    with open('COMPTEL_{}MeV'.format(incident_energy/1000), 'wb') as f:
+    with open('COMPTEL_{}MeV'.format(incident_energy / 1000), 'wb') as f:
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
 # current wall time: 15.6 s

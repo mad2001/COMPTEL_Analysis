@@ -1,0 +1,11 @@
+#!/usr/bin/env python3.5
+
+# toy script test
+
+import os
+import re
+
+print('{:^80}'.format(10))
+print('\nWho are you?')
+name = input()
+print('\nHello '+name)

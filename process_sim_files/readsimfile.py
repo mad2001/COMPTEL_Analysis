@@ -68,7 +68,6 @@ def pull_simdata(filename):
             a (# interactions, 9) ndarray of all data for a single event
 
         """
-
         # convert the values in the strings to numbers
         event_id = float(event_values_re.search(one_event).group('event_id'))
 
@@ -92,7 +91,7 @@ def pull_simdata(filename):
     sim_data = make_eventarray(all_events[0])
     for i, single_event in enumerate(all_events, 1):
         sim_data = np.concatenate(
-                (sim_data, make_eventarray(single_event)))
+                                 (sim_data, make_eventarray(single_event)))
     # convert to data frame
     sim_data = pd.DataFrame(sim_data,
                             columns=['EventID', 'DetectorID', 'ElapsedTime',
