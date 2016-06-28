@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.5
 """Define all necessary volumes for COMPTEL simulation data analysis.
 
 This module defines the necessary volumes for COMPTEL simulation data

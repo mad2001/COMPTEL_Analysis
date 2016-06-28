@@ -10,12 +10,12 @@ import glob
 import pickle
 import pandas as pd
 
-from .Cosima_data.readsimfile import pull_simdata
-from .Cosima_data import transform_data as tr
+from read_sims import pull_simdata
+import transform_data as tr
 
 
 class Data:
-    """Class designed to contain all of the information about the processed simulation."""
+    """Class to contain data from processed simulation file."""
 
     def __init__(self, hits, particle_count, incident_energy):
         self.hits = hits
@@ -47,7 +47,7 @@ def standard_output(sim_files):
 
         hits_df = tr.create_hits(sim_data)
         hits_df = tr.broaden(hits_df)
-        #hits.plot(x='x', y='y', kind='scatter')
+        # hits.plot(x='x', y='y', kind='scatter')
         hits_df = tr.identify_triggers(hits_df)
 
         # convert into the "hits" object
@@ -69,7 +69,7 @@ def standard_output(sim_files):
 
         hits = tr.create_hits(sim_data)
         hits = tr.broaden(hits)
-        #hits.plot(x='x', y='y', kind='scatter')
+        # hits.plot(x='x', y='y', kind='scatter')
         hits = [tr.identify_triggers(hits)]
 
         for i, file in enumerate(files[1:]):
@@ -90,7 +90,7 @@ def standard_output(sim_files):
 
             temp_hits = tr.create_hits(sim_data)
             temp_hits = tr.broaden(temp_hits)
-            #hits.plot(x='x', y='y', kind='scatter')
+            # hits.plot(x='x', y='y', kind='scatter')
             hits.append(tr.identify_triggers(temp_hits))
 
         # concatenate all "hits" data frames in list
@@ -98,7 +98,7 @@ def standard_output(sim_files):
         # convert into the "Hits" object
         data = Data(hits_df, particle_count, incident_energy)
 
-    #hits.to_csv('COMPTEL_dataframe_{}MeV'.format(incident_energy/1000))
+    # hits.to_csv('COMPTEL_dataframe_{}MeV'.format(incident_energy/1000))
     with open('COMPTEL_{}MeV'.format(incident_energy / 1000), 'wb') as f:
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 

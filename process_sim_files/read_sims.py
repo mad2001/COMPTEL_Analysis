@@ -95,7 +95,7 @@ def pull_simdata(filename):
             all_data = np.fromstring(interaction.group('ia'), count=23, sep=';')
             # store interaction ID, detector ID, elapsed time, x, y, z,
             #    particle ID, and kinetic energy)
-            #@NOTE changed particle ID from element 15 to element 7 (from "new particle" to "incident particle")
+            # @NOTE changed particle ID from element 15 to element 7 (from "new particle" to "incident particle")
             interaction_data[i, 1:] = (np.array(
                                        all_data[[2, 3, 4, 5, 6, 7, 22]]))
         return interaction_data
@@ -105,7 +105,7 @@ def pull_simdata(filename):
     sim_data = np.concatenate([make_eventarray(event) for event in all_events])
     sim_data = pd.DataFrame(sim_data,
                             columns=['EventID', 'DetectorID', 'ElapsedTime',
-                                     'x', 'y', 'z', 'NewParticleID', 'Energy'])
+                                     'x', 'y', 'z', 'ParticleID', 'Energy'])
 
     return {'data': sim_data, 'particle count': float(particle_count),
             'incident energy': sim_data.Energy[0]}
