@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Process the sim files.
 
+THIS NEEDS TO BE RESTRUCTURED AT SOME POINT
+
 Created: Tue Jun 30 09:23:38 2015
 Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 """
