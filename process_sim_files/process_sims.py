@@ -33,6 +33,8 @@ def standard_output(sim_files):
     containing Cosima simulation files. If a directory is provided, all *.sim
     files should be from simulations of the same incident energy.
     """
+    directory = os.path.dirname(sim_files)
+
     if os.path.isfile(sim_files):
         # convert *.sim file to Pandas data frame
         data = pull_simdata(sim_files)
@@ -101,6 +103,8 @@ def standard_output(sim_files):
         data = Data(hits_df, particle_count, incident_energy)
 
     # hits.to_csv('COMPTEL_dataframe_{}MeV'.format(incident_energy/1000))
+    new_directory = os.mkdir(os.path.join(directory, 'processed_data'))
+    os.chdir(new_directory)
     with open('COMPTEL_{}MeV'.format(incident_energy / 1000), 'wb') as f:
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
