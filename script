@@ -6,4 +6,7 @@ import os
 import re
 import subprocess
 
-subprocess.run("cosima")
+path = '/Users/morgan/Documents/COMPTEL/COMPTEL_data'
+
+for i in os.walk(path):
+    print(i)

@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 
 import process_sims
-from process_sim_files.geometry import *
+from geometry import *
 
 
 # lists containing modules in each detector layer

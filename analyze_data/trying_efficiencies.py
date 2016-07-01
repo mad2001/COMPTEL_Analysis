@@ -13,7 +13,6 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 
-
 def NE213detector_efficiency(sim_directory, plot=False):
 
     particle_count_re = re.compile(r"""
@@ -36,8 +35,7 @@ def NE213detector_efficiency(sim_directory, plot=False):
         print("""{}: {} particles started, effective area is {}, and
                 {} efficiency.\n\n""".format(file, particle_count, effective_area, efficiency))
 
-    #error = stats.sem(efficiency)
-
+    # error = stats.sem(efficiency)
 
     return
 

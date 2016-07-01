@@ -76,6 +76,7 @@ def standard_output(sim_files):
         # hits.plot(x='x', y='y', kind='scatter')
         hits = [tr.identify_triggers(hits)]
 
+        for i, sim in glob.iglob(sim_data):
         for i, file in enumerate(files[1:]):
             data = pull_simdata(file)
             sim_data = data['data']
@@ -108,4 +109,6 @@ def standard_output(sim_files):
     with open('COMPTEL_{}MeV'.format(incident_energy / 1000), 'wb') as f:
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
-# current wall time: 15.6 s
+if __name__ == '__main__':
+    import sys
+    standard_output(sys.argv[1])
