@@ -107,7 +107,7 @@ def pull_simdata(filename):
                             columns=['EventID', 'DetectorID', 'ElapsedTime',
                                      'x', 'y', 'z', 'ParticleID', 'Energy'])
 
-    return {'data': sim_data, 'particle count': float(particle_count),
+    return {'data': sim_data, 'particle count': int(particle_count),
             'incident energy': sim_data.Energy[0]}
 
 

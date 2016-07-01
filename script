@@ -4,8 +4,6 @@
 
 import os
 import re
+import subprocess
 
-print('{:^80}'.format(10))
-print('\nWho are you?')
-name = input()
-print('\nHello '+name)
+subprocess.run("cosima")

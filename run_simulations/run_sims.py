@@ -25,54 +25,75 @@ def run_sims():
     A regular expression for the line that will change must be provided, along
     with the string that will replace it. An example is provided in the script.
     """
-    source_file_path = '/Some/Path/Name'
-    sim_dir = '/Volumes/MORGAN/newCOMPTEL_simulation_data'
+    source_file_path = '/Users/morgan/Documents/COMPTEL/COMPTELpractice.source'
+    sim_dir = '/Users/morgan/Documents/COMPTEL/COMPTEL_data'
     trials = 2
 
     """ """ """ """ """ PROVIDE ENERGY AS A LIST """ """ """ """ """
-    #energy = [1, 5, 15, 30, 55, 100]
+    # energy = [1, 5, 15, 30, 55, 100]
+    energy = [50]
+    # angles = [0, 10, 20, 30, 40, 50, 60]
+    angles = [0, 10, 20, 30, 40, 50, 60]
 
     """ """ """ """ """ PROVIDE ENERGY AS A RANGE """ """ """ """ """
-    low_energy = 1      # lowest energy simulated (in MeV)
-    high_energy = 100   # highest energy simulated (in MeV)
-    energy_step = 5     # interval
-    energy = [x for x in range(low_energy, high_energy, energy_step)]
+    # low_energy = 1      # lowest energy simulated (in MeV)
+    # high_energy = 100   # highest energy simulated (in MeV)
+    # energy_step = 5     # interval
+    # energy = [x for x in range(low_energy, high_energy, energy_step)]
 
-    # change to *.sim file directory
     if not os.path.exists(sim_dir):
         os.makedirs(sim_dir)
-    os.chdir(sim_dir)
 
     source_dir, source_file = os.path.split(source_file_path)
     with open(source_file_path, 'r') as in_file:
         # creates a list with each line in source file as an element
-        lines = in_file.readlines()
+        lines = in_file.read()
 
     for E in energy:
         """ """ """  THIS SECTION SHOULD BE EDITED BEFORE RUNNING  """ """ """
-        # update file name
-        line1_regex = 'CollectData\.FileName COMPTELdata_\d+.?\d*MeV\n'
-        line1_write = 'CollectData.FileName COMPTELdata_{}MeV\n'
-        lines = re.sub(line1_regex, line1_write.format(E), lines)
-
         # update incident energy (changing from MeV to keV)
-        line2_regex = 'neutron\.Spectrum Mono \d+.?\d*\n'
-        line2_write = 'neutron.Spectrum Mono {}\n'
-        lines = re.sub(line2_regex, line2_write.format(E * 1000), lines)
+        energy_regex = 'neutron\.Spectrum Mono .+\n'
+        energy_write = 'neutron.Spectrum Mono {}\n'
+        lines = re.sub(energy_regex, energy_write.format(E * 1000), lines)
         """ """ """ """ """ """""""" END OF SECTION """"""" """ """ """ """ """
+        for theta in angles:
+            """ """ """ THIS SECTION SHOULD BE EDITED BEFORE RUNNING """ """ """
+            # update incident angle
+            angle_regex = 'neutron.Beam FarFieldAreaSource .+\n'
+            angle_write = 'neutron.Beam FarFieldAreaSource {} {} 0 360\n'
+            lines = re.sub(angle_regex, angle_write.format(theta, theta+1), lines)
 
-        with open(source_file_path, 'w') as out_file:
-            out_file.write(lines)
+            # update file name
+            filename_regex = 'CollectData\.FileName .+\n'
+            filename_write = 'CollectData.FileName COMPTEL{}MeV_{}deg\n'
+            lines = re.sub(filename_regex, filename_write.format(E, theta), lines)
+            """ """ """ """ """ """""""" END OF SECTION """"""" """ """ """ """ """
+            output_dir = os.path.join(sim_dir,
+                                      'COMPTEL{}MeV_{}deg'.format(E, theta))
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            os.chdir(output_dir)
 
-        # run Cosima
-        for i in range(trials):
-            subprocess.run('cosima ' + source_file_path,
-                           universal_newlines=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.STDOUT,
-                           shell=True)
+            with open(source_file_path, 'w') as out_file:
+                out_file.write(lines)
+            print('Simulating COMPTEL\'s response to {}MeV neutrons at {} degrees...'.format(E, theta))
+
+            # run Cosima
+            for i in range(trials):
+                # f = subprocess.run('cosima ' + source_file_path,
+                #                universal_newlines=True,
+                #                stdout=subprocess.PIPE,
+                #                stderr=subprocess.STDOUT,
+                #                shell=True)
+                # print(f)
+                subprocess.run(['cosima', source_file_path])
 
 
 if __name__ == '__main__':
     # adjust parameters within the function itself
+    import time
+
+    start = time.clock()
     run_sims()
+    end = time.clock()
+    print(end - start)
