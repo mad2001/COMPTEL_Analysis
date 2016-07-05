@@ -34,6 +34,10 @@ def standard_output(sim_files):
     files should be from simulations of the same incident energy.
     """
     directory = os.path.dirname(sim_files)
+    new_directory = os.path.join(directory, 'processed_data')
+    if not os.path.exists(new_directory):
+        os.mkdirs(new_directory)
+    os.chdir(new_directory)
 
     if os.path.isfile(sim_files):
         # convert *.sim file to Pandas data frame
@@ -57,58 +61,43 @@ def standard_output(sim_files):
         # convert into the "hits" object
         data = Data(hits_df, particle_count, incident_energy)
 
+        with open('COMPTEL_{}MeV'.format(incident_energy / 1000), 'wb') as f:
+            pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+
     if os.path.isdir(sim_files):
+        for dirName, subdirList, fileList in os.walk(sim_files):
+            hits = []
+            particle_count = 0
+            for sim in glob.iglob(dirName + '/*.sim'):
+                print(sim)
+                data = pull_simdata(sim)
+                sim_data = data['data']
+                particle_count += data['particle count']
+                incident_energy = data['incident energy']
 
-        files = glob.glob(sim_files + '*.sim')
-        data = pull_simdata(files[0])
-        sim_data = data['data']
-        particle_count = data['particle count']
-        incident_energy = data['incident energy']
+                # error catching
+                if data['incident energy'] != incident_energy:
+                    print('Files in directory do not use the same incident energy.')
 
-        # change detector ID to format that identifies detector and module
-        sim_data['DetectorID'] = sim_data.apply(tr.identify_COMPTELmodule, axis=1)
+                # change detector ID to format that identifies detector and module
+                sim_data['DetectorID'] = sim_data.apply(tr.identify_COMPTELmodule, axis=1)
 
-        # convert to electron equivalent
-        sim_data['Energy'] = sim_data.apply(tr.electron_equivalent, axis=1)
+                # convert to electron equivalent
+                sim_data['Energy'] = sim_data.apply(tr.electron_equivalent, axis=1)
 
-        hits = tr.create_hits(sim_data)
-        hits = tr.broaden(hits)
-        # hits.plot(x='x', y='y', kind='scatter')
-        hits = [tr.identify_triggers(hits)]
+                temp_hits = tr.create_hits(sim_data)
+                temp_hits = tr.broaden(temp_hits)
+                # hits.plot(x='x', y='y', kind='scatter')
+                hits.append(tr.identify_triggers(temp_hits))
 
-        for i, sim in glob.iglob(sim_data):
-        for i, file in enumerate(files[1:]):
-            data = pull_simdata(file)
-            sim_data = data['data']
-
-            # error catching
-            if data['incident energy'] != incident_energy:
-                print('Files in directory do not use the same neutron energy.')
-
-            particle_count += data['particle count']
-
-            # change detector ID to format that identifies detector and module
-            sim_data['DetectorID'] = sim_data.apply(tr.identify_COMPTELmodule, axis=1)
-
-            # convert to electron equivalent
-            sim_data['Energy'] = sim_data.apply(tr.electron_equivalent, axis=1)
-
-            temp_hits = tr.create_hits(sim_data)
-            temp_hits = tr.broaden(temp_hits)
-            # hits.plot(x='x', y='y', kind='scatter')
-            hits.append(tr.identify_triggers(temp_hits))
-
-        # concatenate all "hits" data frames in list
-        hits_df = pd.concat(hits)
-        # convert into the "Hits" object
-        data = Data(hits_df, particle_count, incident_energy)
-
-    # hits.to_csv('COMPTEL_dataframe_{}MeV'.format(incident_energy/1000))
-    new_directory = os.mkdir(os.path.join(directory, 'processed_data'))
-    os.chdir(new_directory)
-    with open('COMPTEL_{}MeV'.format(incident_energy / 1000), 'wb') as f:
-        pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+            if hits:
+                # concatenate all "hits" data frames in list
+                hits_df = pd.concat(hits)
+                # convert into the "Hits" object
+                data = Data(hits_df, particle_count, incident_energy)
+                with open(dirName + '_processed', 'wb') as f:
+                    pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
 if __name__ == '__main__':
-    import sys
-    standard_output(sys.argv[1])
+    JimRyansSims = '/Users/morgan/Documents/COMPTEL/COMPTEL_data'
+    standard_output(JimRyansSims)

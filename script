@@ -8,5 +8,10 @@ import subprocess
 
 path = '/Users/morgan/Documents/COMPTEL/COMPTEL_data'
 
-for i in os.walk(path):
-    print(i)
+for dirName, subdirList, fileList in os.walk(path):
+    print(dirName)
+    if not subdirList:
+        print('None yall')
+    print(subdirList)
+    print(fileList)
+    print('\n')
