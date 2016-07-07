@@ -15,8 +15,25 @@ from scipy.constants import pi, m_n, kilo, eV
 import matplotlib.pyplot as plt
 
 
+def effective_area(data):
+    # COMPTEL's area
+    detector_area = 4042.1739633515281
+        # 7 D1 scintillators
+        # modeled as 16 sided polygons with an apothem of 13.47
+        # detector area comes from (13.47^2)(16)(tan(pi/16))
+
+    surrounding_sphere_radius = 250
+    start_area = pi * surrounding_sphere_radius**2
+
+    # calculate effective area of COMPTEL for neutrons
+    effective_area = start_area * (data.triggered_events / data.particle_count)
+
+    return effective_area
+
+
 def efficiency(data):
 
+    # COMPTEL's area
     detector_area = 4042.1739633515281
         # 7 D1 scintillators
         # modeled as 16 sided polygons with an apothem of 13.47

@@ -97,7 +97,7 @@ def pull_simdata(filename):
             #    particle ID, and kinetic energy)
             # @NOTE changed particle ID from element 15 to element 7 (from "new particle" to "incident particle")
             interaction_data[i, 1:] = (np.array(
-                                       all_data[[2, 3, 4, 5, 6, 7, 22]]))
+                                       all_data[[2, 3, 4, 5, 6, 15, 22]]))
         return interaction_data
 
     # @NOTE this bit seems silly... make a list of ndarrays, concat to one

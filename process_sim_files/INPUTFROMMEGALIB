@@ -33,3 +33,7 @@ INTERACTION KEY
     22(20): y polarization of new particle
     23(21): z polarization of new particle
     24(22): kinetic energy of new particle in keV
+
+When the data is put into a ndarray in read_sims.py, the interaction type is not
+stored, and the list is zero indexed; the numbers in parentheses correspond to
+the indexed numbers.

@@ -36,7 +36,7 @@ def standard_output(sim_files):
     directory = os.path.dirname(sim_files)
     new_directory = os.path.join(directory, 'processed_data')
     if not os.path.exists(new_directory):
-        os.mkdirs(new_directory)
+        os.makedirs(new_directory)
     os.chdir(new_directory)
 
     if os.path.isfile(sim_files):
@@ -57,6 +57,7 @@ def standard_output(sim_files):
         hits_df = tr.broaden(hits_df)
         # hits.plot(x='x', y='y', kind='scatter')
         hits_df = tr.identify_triggers(hits_df)
+        print(hits_df)
 
         # convert into the "hits" object
         data = Data(hits_df, particle_count, incident_energy)
@@ -89,6 +90,7 @@ def standard_output(sim_files):
                 temp_hits = tr.broaden(temp_hits)
                 # hits.plot(x='x', y='y', kind='scatter')
                 hits.append(tr.identify_triggers(temp_hits))
+                print(hits)
 
             if hits:
                 # concatenate all "hits" data frames in list
@@ -98,6 +100,8 @@ def standard_output(sim_files):
                 with open(dirName + '_processed', 'wb') as f:
                     pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
+
 if __name__ == '__main__':
-    JimRyansSims = '/Users/morgan/Documents/COMPTEL/COMPTEL_data'
+    # import sys
+    JimRyansSims = '/Users/morgan/Documents/COMPTEL/COMPTEL_data/COMPTEL_30MeVdata'
     standard_output(JimRyansSims)

@@ -1,4 +1,4 @@
-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
          =========================================================
            the MEGAlib Extension for Neutron Interaction Analysis
@@ -35,11 +35,9 @@ The file run_sims.py must be edited before running. Parameters include:
     - full path to the Cosima *.source file being run
     - the full path of the directory where the output *.sim files will be saved
     - the incident energy levels to simulate
+    - the incident angles to simulate
     - the number of simulations to run at each energy level
 Additionally, the find-and-replace lines for the *.source file must be specified
 within the run_sims module.
 
-There are two ways to run Python scripts from your shell:
-    1) use "python run_sims.py"
-    2) make the file executable ("chmod +x run_sims.py"), then run with the
-       command "./run_sims.py"
+Use the command "python run_sims.py" to run.

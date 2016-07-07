@@ -27,19 +27,23 @@ def run_sims():
     """
     source_file_path = '/Users/morgan/Documents/COMPTEL/COMPTELpractice.source'
     sim_dir = '/Users/morgan/Documents/COMPTEL/COMPTEL_data'
-    trials = 2
+    trials = 3
 
-    """ """ """ """ """ PROVIDE ENERGY AS A LIST """ """ """ """ """
+    """ """ """ """ """ PROVIDE PARAMETERS AS A LIST """ """ """ """ """
     # energy = [1, 5, 15, 30, 55, 100]
-    energy = [50]
+    energy = [30, 50]
     # angles = [0, 10, 20, 30, 40, 50, 60]
     angles = [0, 10, 20, 30, 40, 50, 60]
 
-    """ """ """ """ """ PROVIDE ENERGY AS A RANGE """ """ """ """ """
+    """ """ """ """ """ PROVIDE PARAMETERS AS A RANGE """ """ """ """ """
     # low_energy = 1      # lowest energy simulated (in MeV)
     # high_energy = 100   # highest energy simulated (in MeV)
     # energy_step = 5     # interval
     # energy = [x for x in range(low_energy, high_energy, energy_step)]
+    # min_angle = 0
+    # max_angle = 60
+    # angle_step = 10
+    # angles = [x for x in range(min_angle, max_angle, angle_step)]
 
     if not os.path.exists(sim_dir):
         os.makedirs(sim_dir)
