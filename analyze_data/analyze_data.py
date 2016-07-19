@@ -16,51 +16,43 @@ import neutron_analysis as na
 sys.path.insert(0, '/Users/morgan/summer_research/process_sim_files')
 from process_sims import Data
 
+
 def open_data(path_to_pickles):
     """
     Outputs
     """
 
-    eff30 = []
-    err30 = []
-    for pckl in glob.iglob(path_to_pickles + '/COMPTEL30MeV*_processed'):
+    energy = [20, 30, 50, 100]
+    angles = [0, 10, 20, 30, 40, 50, 60]
+    # plt.rc('text', usetex=True)
+    # plt.rc('font', family='serif')
 
-        angles = [0, 10, 20, 30, 40, 50, 60]
-        with open(pckl, 'rb') as f:
-            data = pickle.load(f)
-        eff = na.effective_area(data)
-        eff30.append(eff)
-        err30.append(eff/sqrt(data.triggered_events))
+    with open('output_data.txt', 'w') as f:
+        for E in energy:
+            eff = []
+            err = []
+            i = 0
+            for pckl in glob.iglob( path_to_pickles + '/COMPTEL{}MeV*'.format(E) ):
+                with open(pckl, 'rb') as p:
+                    data = pickle.load(p)
+                E_A = na.effective_area(data)
+                eff.append(E_A)
+                err.append(E_A/sqrt(data.triggered_events))
 
+                f.write('{}, {}, {}\n'.format(E, angles[i], E_A))
+                i += 1
 
-    eff50 = []
-    err50 = []
-    for pckl in glob.iglob(path_to_pickles + '/COMPTEL50MeV*_processed'):
-
-        angles = [0, 10, 20, 30, 40, 50, 60]
-        with open(pckl, 'rb') as f:
-            data = pickle.load(f)
-        eff = na.effective_area(data)
-        eff50.append(eff)
-        err50.append(eff/sqrt(data.triggered_events))
-
-    plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
-    plt.plot(angles, eff30, 'bo', angles, eff50, 'ro')
-    plt.hold(True)
-    plt.xlim(-1, 61)
-    plt.errorbar(angles, eff30, yerr=err30, fmt='.', capthick=1.5)
-    plt.errorbar(angles, eff50, yerr=err50, fmt='r.', ecolor='r', capthick=1.5)
-    plt.ylabel(r'Effective Area (cm\textsuperscript{2})')
-    plt.xlabel(r'Neutron Incident Angle')
-    plt.title(r'COMPTEL Effective Area')
-    plt.legend([r'30 MeV', r'50 MeV'])
-    plt.grid(True)
-    plt.savefig('COMPTELeffective_area')
-    plt.show()
+            # plt.errorbar(angles, eff, yerr=err, fmt='s', capthick=1.5)
+            # plt.hold(True)
 
 
-
+    # plt.xlim(-1, 61)
+    # plt.ylabel(r'Effective Area (cm\textsuperscript{2})')
+    # plt.xlabel(r'Neutron Incident Angle')
+    # plt.title(r'COMPTEL Effective Area')
+    # plt.legend([r'20 MeV', r'30 MeV', r'50 MeV', r'100 MeV'])
+    # plt.grid(True)
+    # plt.savefig('COMPTELeffective_area')
 
 
     # plot efficiency vs energy

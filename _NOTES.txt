@@ -1,2 +1,0 @@
-One of the slowest parts is readsimfile.py
-    - has lots of room for performance increase

@@ -1,3 +1,12 @@
+------------------------------------------------------------------------------
+
+         =========================================================
+           the MEGAlib Extension for Neutron Interaction Analysis
+         =========================================================
+                  Morgan A. Daly (mad2001@wildcats.unh.edu)
+                                 Summer 2016
+
+
 The program was designed in order to expand the functionality of the Medium
 Energy Gamma Ray Astronomy Library (MEGAlib) for use in analyzing the neutron
 response of COMPTEL. While the MEGAlib packages Geomega (used for modeling
@@ -37,11 +46,12 @@ object is saved in a new directory as a binary file. This makes the processed
 data easily accessible for analysis at a later point in time.
 
 The following software is required for full functionality:
-+Python version 3.5 (or greater)
-+MEGAlib
-+numpy
-+pandas
-+matplotlib
+  - MEGAlib version 2.3
+  - Python version 3.5 (or greater)
+  - MEGAlib
+  - numpy
+  - pandas
+  - matplotlib
 
 It is recommended to install the required python libraries with the package
 manager Anaconda (which includes all of the required libraries) or the lighter

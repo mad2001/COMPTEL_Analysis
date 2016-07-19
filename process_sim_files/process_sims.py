@@ -37,7 +37,6 @@ def standard_output(sim_files):
     new_directory = os.path.join(directory, 'processed_data')
     if not os.path.exists(new_directory):
         os.makedirs(new_directory)
-    os.chdir(new_directory)
 
     if os.path.isfile(sim_files):
         # convert *.sim file to Pandas data frame
@@ -67,10 +66,14 @@ def standard_output(sim_files):
 
     if os.path.isdir(sim_files):
         for dirName, subdirList, fileList in os.walk(sim_files):
+
+            dataFile = os.path.join(new_directory, os.path.basename(dirName))
+            if os.path.exists(dataFile):
+                continue
+
             hits = []
             particle_count = 0
             for sim in glob.iglob(dirName + '/*.sim'):
-                print(sim)
                 data = pull_simdata(sim)
                 sim_data = data['data']
                 particle_count += data['particle count']
@@ -90,18 +93,17 @@ def standard_output(sim_files):
                 temp_hits = tr.broaden(temp_hits)
                 # hits.plot(x='x', y='y', kind='scatter')
                 hits.append(tr.identify_triggers(temp_hits))
-                print(hits)
 
             if hits:
                 # concatenate all "hits" data frames in list
                 hits_df = pd.concat(hits)
                 # convert into the "Hits" object
                 data = Data(hits_df, particle_count, incident_energy)
-                with open(dirName + '_processed', 'wb') as f:
+                with open(dataFile, 'wb') as f:
                     pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == '__main__':
     # import sys
-    JimRyansSims = '/Users/morgan/Documents/COMPTEL/COMPTEL_data/COMPTEL_30MeVdata'
+    JimRyansSims = '/Users/morgan/Documents/COMPTEL/COMPTEL_data'
     standard_output(JimRyansSims)

@@ -27,11 +27,11 @@ def run_sims():
     """
     source_file_path = '/Users/morgan/Documents/COMPTEL/COMPTELpractice.source'
     sim_dir = '/Users/morgan/Documents/COMPTEL/COMPTEL_data'
-    trials = 3
+    trials = 2
 
     """ """ """ """ """ PROVIDE PARAMETERS AS A LIST """ """ """ """ """
     # energy = [1, 5, 15, 30, 55, 100]
-    energy = [30, 50]
+    energy = [20, 100]
     # angles = [0, 10, 20, 30, 40, 50, 60]
     angles = [0, 10, 20, 30, 40, 50, 60]
 
@@ -84,20 +84,9 @@ def run_sims():
 
             # run Cosima
             for i in range(trials):
-                # f = subprocess.run('cosima ' + source_file_path,
-                #                universal_newlines=True,
-                #                stdout=subprocess.PIPE,
-                #                stderr=subprocess.STDOUT,
-                #                shell=True)
-                # print(f)
                 subprocess.run(['cosima', source_file_path])
 
 
 if __name__ == '__main__':
-    # adjust parameters within the function itself
-    import time
 
-    start = time.clock()
     run_sims()
-    end = time.clock()
-    print(end - start)

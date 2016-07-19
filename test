@@ -1,0 +1,8 @@
+import os
+import re
+
+dirName = '/Users/morgan/Documents/COMPTEL/COMPTEL_data/COMPTEL100MeV_60deg'
+it = os.path.basename(dirName)
+
+angle = re.findall( '[\d]{1,3}', it)
+print(angle[1])
