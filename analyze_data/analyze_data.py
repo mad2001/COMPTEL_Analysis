@@ -14,7 +14,7 @@ from numpy import sqrt
 import neutron_analysis as na
 
 sys.path.insert(0, '/Users/morgan/summer_research/process_sim_files')
-from process_sims import Data
+from read_sims import Data
 
 
 def open_data(path_to_pickles):

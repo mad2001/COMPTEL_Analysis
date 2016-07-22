@@ -1,0 +1,22 @@
+Below is a sample of the file tree created during the simulation of a radiation
+detector:
+
+
+
+> COMPTEL
+    > COMPTEL_data
+        > COMPTEL20MeV_0deg
+            > COMPTEL20MeV_0deg.inc1.id1.sim
+            > COMPTEL20MeV_0deg.inc2.id1.sim
+        > COMPTEL20MeV_20deg
+            > COMPTEL20MeV_20deg.inc1.id1.sim
+            > COMPTEL20MeV_20deg.inc2.id1.sim
+        > COMPTEL100MeV_20deg
+            > COMPTEL100MeV_20deg.inc1.id1.sim
+            > COMPTEL100MeV_20deg.inc2.id1.sim
+        > processed_data
+            > COMPTEL20MeV_0deg
+            > COMPTEL20MeV_20deg
+            > COMPTEL100MeV_20deg
+    > COMPTEL_geometry
+    > runCOMPTEL.source

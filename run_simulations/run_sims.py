@@ -65,11 +65,13 @@ def run_sims():
             # update incident angle
             angle_regex = 'neutron.Beam FarFieldAreaSource .+\n'
             angle_write = 'neutron.Beam FarFieldAreaSource {} {} 0 360\n'
+            # sub(pattern, replace, string)
             lines = re.sub(angle_regex, angle_write.format(theta, theta+1), lines)
 
             # update file name
             filename_regex = 'CollectData\.FileName .+\n'
             filename_write = 'CollectData.FileName COMPTEL{}MeV_{}deg\n'
+            # sub(pattern, replace, string)
             lines = re.sub(filename_regex, filename_write.format(E, theta), lines)
             """ """ """ """ """ """""""" END OF SECTION """"""" """ """ """ """ """
             output_dir = os.path.join(sim_dir,

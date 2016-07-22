@@ -14,6 +14,29 @@ import numpy as np
 import pandas as pd
 
 
+class Data:
+    """Class to contain data from processed simulation file."""
+
+    def __init__(self, hits, particle_count, incident_energy, angle):
+        self.hits = hits
+        self.particle_count = particle_count
+        self.incident_energy = incident_energy
+        self.angle = angle
+        self.triggered_events = len(self.hits.index)
+
+    def combine(self, data_object):
+        self.hits = pd.concat([self.hits, data_object.hits])
+        self.particle_count += data_object.particle_count
+
+        if self.incident_energy != data_object.incident_energy:
+                print('WARNING:\n')
+                print('Combining files with different incident energies!\n')
+        if self.angle != data_object.angle:
+                print('WARNING:\n')
+                print('Combining files with different incident angles!\n')
+
+
+
 def pull_simdata(filename):
     """Store data from a *.sim file as a pandas dataframe.
 
@@ -60,7 +83,7 @@ def pull_simdata(filename):
     all_events = event_re.findall(simfile)
 
     # store the total number of incident particles
-    particle_count = particle_count_re.search(simfile).group(0)
+    particle_count = int(particle_count_re.search(simfile).group(0))
 
     def make_eventarray(one_event):
         """Create a single array containing the event and interaction data.
@@ -106,9 +129,10 @@ def pull_simdata(filename):
     sim_data = pd.DataFrame(sim_data,
                             columns=['EventID', 'DetectorID', 'ElapsedTime',
                                      'x', 'y', 'z', 'ParticleID', 'Energy'])
+    # temporary place holder
+    angle = 0
 
-    return {'data': sim_data, 'particle count': int(particle_count),
-            'incident energy': sim_data.Energy[0]}
+    return Data(sim_data, particle_count, sim_data.Energy[0], angle)
 
 
 # current wall time of ~4s processing of 30MB *.sim file
@@ -122,7 +146,7 @@ if __name__ == '__main__':
     print("Would you like to see all recorded data? (y/n)")
     ans = input()
     if ans == 'y':
-        print(data['data'])
+        print(data.hits)
     elif ans == 'n':
         print('\nExiting now.\n')
     else:

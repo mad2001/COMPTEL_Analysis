@@ -9,16 +9,15 @@
     -------
     Summary
     -------
-The run_sims module allows for the automation of detector simulations using
-MEGAlib's Cosima package.
+The run_sims module automates simulations using MEGAlib's Cosima package.
 
 This is especially useful for low efficiency detectors where the processing
 module will be used, as several smaller *.sim files created by the same *.source
 file are handled better than a single very large one.
 
-The *.source file specifies the particle's incident energy, so it must be edited
-for each energy level simulated. This is done explicitly in the run_sims module
-as a "find-and-replace" using the regex function sub(pattern, replace, string),
+The *.source file specifies the particle's incident energy and angle, so it must
+be edited for each new parameter simulated. This is done fairly explicitly in
+the run_sims module using a "find-and-replace" method with regular expressions.
 and must be edited in order to match the *.source file being used. Generally,
 the only lines that will be changed are the lines describing the source, and
 the line specifying the filename. These are shown as examples in the module.

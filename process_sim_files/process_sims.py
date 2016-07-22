@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """Process the sim files.
 
-THIS NEEDS TO BE RESTRUCTURED AT SOME POINT
-
 Created: Tue Jun 30 09:23:38 2015
 Author: Morgan A. Daly (mad2001@wildcats.unh.edu)
 """
 
 import os
+import re
 import glob
 import pickle
 import pandas as pd
@@ -16,14 +15,29 @@ from read_sims import pull_simdata
 import transform_data as tr
 
 
-class Data:
-    """Class to contain data from processed simulation file."""
+def process_file(sim_file):
 
-    def __init__(self, hits, particle_count, incident_energy):
-        self.hits = hits
-        self.particle_count = particle_count
-        self.incident_energy = incident_energy
-        self.triggered_events = len(hits.index)
+    # the Data object defined in read_sims module
+    data = pull_simdata(sim_file)
+
+    file_name = re.search('(?<=/)[\w]+?(?=\.inc)', sim_file).group(0)
+    data.angle = int(re.search('[\d]{1,3}(?=deg)', sim_file).group(0))
+
+    # the DataFrame of interaction data
+    sim_data = data.hits
+
+    # change detector ID to format that identifies detector and module
+    sim_data['DetectorID'] = sim_data.apply(tr.identify_COMPTELmodule, axis=1)
+
+    # convert to electron equivalent
+    sim_data['Energy'] = sim_data.apply(tr.electron_equivalent, axis=1)
+
+    sim_data = tr.create_hits(sim_data)
+    sim_data = tr.broaden(sim_data)
+    # hits.plot(x='x', y='y', kind='scatter')
+    sim_data = tr.identify_triggers(sim_data)
+
+    return data
 
 
 def standard_output(sim_files):
@@ -33,77 +47,43 @@ def standard_output(sim_files):
     containing Cosima simulation files. If a directory is provided, all *.sim
     files should be from simulations of the same incident energy.
     """
-    directory = os.path.dirname(sim_files)
-    new_directory = os.path.join(directory, 'processed_data')
-    if not os.path.exists(new_directory):
-        os.makedirs(new_directory)
 
     if os.path.isfile(sim_files):
-        # convert *.sim file to Pandas data frame
-        data = pull_simdata(sim_files)
+        out_dir = os.path.join(os.path.dirname(os.path.dirname(sim_files)), 'processed_data')
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
 
-        sim_data = data['data']
-        particle_count = data['particle count']
-        incident_energy = data['incident energy']
+        data = process_file(sim_files)
 
-        # change detector ID to format that identifies detector and module
-        sim_data['DetectorID'] = sim_data.apply(tr.identify_COMPTELmodule, axis=1)
+        filename = os.path.join(out_dir, 'COMPTEL{}MeV_{}deg'.format(
+                                int(data.incident_energy / 1000), data.angle))
 
-        # convert to electron equivalent
-        sim_data['Energy'] = sim_data.apply(tr.electron_equivalent, axis=1)
-
-        hits_df = tr.create_hits(sim_data)
-        hits_df = tr.broaden(hits_df)
-        # hits.plot(x='x', y='y', kind='scatter')
-        hits_df = tr.identify_triggers(hits_df)
-        print(hits_df)
-
-        # convert into the "hits" object
-        data = Data(hits_df, particle_count, incident_energy)
-
-        with open('COMPTEL_{}MeV'.format(incident_energy / 1000), 'wb') as f:
+        with open(filename, 'wb') as f:
             pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
     if os.path.isdir(sim_files):
+        out_dir = os.path.join(os.path.dirname(sim_files), 'processed_data')
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
         for dirName, subdirList, fileList in os.walk(sim_files):
 
-            dataFile = os.path.join(new_directory, os.path.basename(dirName))
-            if os.path.exists(dataFile):
+            filename = os.path.join(out_dir, os.path.basename(dirName))
+            if os.path.exists(filename):
                 continue
 
-            hits = []
-            particle_count = 0
-            for sim in glob.iglob(dirName + '/*.sim'):
-                data = pull_simdata(sim)
-                sim_data = data['data']
-                particle_count += data['particle count']
-                incident_energy = data['incident energy']
+            sims = glob.glob(dirName + '/*.sim')
 
-                # error catching
-                if data['incident energy'] != incident_energy:
-                    print('Files in directory do not use the same incident energy.')
+            if sims:
+                data = process_file(sims[0])
 
-                # change detector ID to format that identifies detector and module
-                sim_data['DetectorID'] = sim_data.apply(tr.identify_COMPTELmodule, axis=1)
+                for s in sims[1:]:
+                    data.combine(s)
 
-                # convert to electron equivalent
-                sim_data['Energy'] = sim_data.apply(tr.electron_equivalent, axis=1)
-
-                temp_hits = tr.create_hits(sim_data)
-                temp_hits = tr.broaden(temp_hits)
-                # hits.plot(x='x', y='y', kind='scatter')
-                hits.append(tr.identify_triggers(temp_hits))
-
-            if hits:
-                # concatenate all "hits" data frames in list
-                hits_df = pd.concat(hits)
-                # convert into the "Hits" object
-                data = Data(hits_df, particle_count, incident_energy)
-                with open(dataFile, 'wb') as f:
+                with open(filename, 'wb') as f:
                     pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == '__main__':
-    # import sys
-    JimRyansSims = '/Users/morgan/Documents/COMPTEL/COMPTEL_data'
-    standard_output(JimRyansSims)
+    import sys
+    standard_output(sys.argv[1])

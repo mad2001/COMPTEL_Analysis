@@ -1,8 +1,15 @@
 import os
 import re
 
-dirName = '/Users/morgan/Documents/COMPTEL/COMPTEL_data/COMPTEL100MeV_60deg'
+dirName = '/Users/morgan/Documents/COMPTEL/COMPTEL_data/COMPTEL30MeV_30deg/COMPTEL30MeV_30deg.inc1.id1.sim '
+fh = '/Users/morgan/Documents/COMPTEL/COMPTEL20MeV_0deg.inc1.id1.sim'
 it = os.path.basename(dirName)
 
-angle = re.findall( '[\d]{1,3}', it)
-print(angle[1])
+file_name = re.search('(?<=/)[\w]+?(?=\.inc)', fh)
+
+angle = re.search('[\d]{1,3}(?=deg)', it)
+print(file_name.group(0))
+
+t = [1]
+
+print(os.path.dirname(os.path.dirname(dirName)))
