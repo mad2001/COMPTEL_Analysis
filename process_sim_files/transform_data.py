@@ -172,6 +172,8 @@ def broaden(hits):
         The D1 layer's energy resolution depends on both the specific module
         and the energy of the interaction. d1energy_resolution returns a
         function based on the module so that only energy input is needed.
+
+        Energy must be in units of keV.
         """
         if module == 1.01:
             A = -1.022
@@ -201,13 +203,15 @@ def broaden(hits):
 
         Uses numpy broadening function with input energy and accepted D2 energy
         resolution which is a function of energy.
-        """
-        try:
-            # this is resolution that Mark gave
-            return np.random.normal(energy, (1.28 * energy + 3.6 * energy**2))
 
-            # not sure where this resolution came from?
-            # return np.random.normal(energy, (1.72 * np.sqrt(energy) - 11.8))
+        Energy must be in units of MeV.
+        """
+        # conver to MeV
+        energy = energy / 1000
+
+        try:
+            sigma = 0.01 * np.sqrt(9.86 * energy + 4.143 * energy**2)
+            return np.random.normal(energy, sigma)
 
         # accounts for possibility of all energy values being zero
         except ValueError:

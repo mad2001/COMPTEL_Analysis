@@ -2,7 +2,6 @@ Below is a sample of the file tree created during the simulation of a radiation
 detector:
 
 
-
 > COMPTEL
     > COMPTEL_data
         > COMPTEL20MeV_0deg

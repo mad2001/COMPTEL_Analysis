@@ -12,6 +12,7 @@ import re
 
 import numpy as np
 import pandas as pd
+from scipy.constants import pi, m_n, kilo, eV
 
 
 class Data:
@@ -23,6 +24,33 @@ class Data:
         self.incident_energy = incident_energy
         self.angle = angle
         self.triggered_events = len(self.hits.index)
+        # normal vector from point in D1 to point in D2
+        self.path_length = np.linalg.norm(self.hits[['x_2', 'y_2', 'z_2']].values -
+                                  self.hits[['x_1', 'y_1', 'z_1']].values,
+                                  axis=1)
+
+    def measured_energy(self):
+
+        # calculate classical kinetic energy in joules
+        E_n = .5 * m_n * (self.path_length / self.hits['TimeOfFlight'].values)**2
+
+        # convert to keV
+        E_n = E_n / (eV * kilo)
+
+        return E_n + self.hits['D1Energy'].values
+
+
+    def measured_angle(self):
+
+        # calculate classical kinetic energy in joules
+        E_n = .5 * m_n * (self.path_length / self.hits['TimeOfFlight'].values)**2
+
+        # convert to keV
+        E_n = E_n / (eV * kilo)
+
+        # measured scattered angle derived from n-p scattering kinematics
+        return np.arctan(sqrt(self.hits['D1Energy'].values / E_n))
+
 
     def combine(self, data_object):
         self.hits = pd.concat([self.hits, data_object.hits])
@@ -34,7 +62,6 @@ class Data:
         if self.angle != data_object.angle:
                 print('WARNING:\n')
                 print('Combining files with different incident angles!\n')
-
 
 
 def pull_simdata(filename):

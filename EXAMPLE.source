@@ -1,0 +1,27 @@
+// simulating COMPTEL neutron response
+//	16 June 2015
+
+Version 1.0
+
+Geometry /Users/morgan/Documents/COMPTEL/COMPTEL_geometry/COMPTEL.geo.setup
+PhysicsListEM Livermore-Pol
+PhysicsListHD QGSP-BERT-HP
+
+StoreSimulationInfo true
+StoreCalibrated true
+StoreScientific true 6
+StoreSimulationInfoIonization false
+DiscretizeHits false
+
+Run CollectData
+CollectData.FileName COMPTEL100MeV_60deg
+CollectData.Triggers 50000
+
+CollectData.Source neutron
+neutron.ParticleType 6
+neutron.Spectrum Mono 100000
+neutron.Beam FarFieldAreaSource 60 61 0 360
+//                              mintheta  maxtheta  minphi  maxphi
+neutron.Flux 1
+
+DefaultRangeCut .5

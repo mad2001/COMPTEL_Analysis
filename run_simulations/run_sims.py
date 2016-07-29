@@ -31,7 +31,7 @@ def run_sims():
 
     """ """ """ """ """ PROVIDE PARAMETERS AS A LIST """ """ """ """ """
     # energy = [1, 5, 15, 30, 55, 100]
-    energy = [20, 100]
+    energy = [25, 40, 75]
     # angles = [0, 10, 20, 30, 40, 50, 60]
     angles = [0, 10, 20, 30, 40, 50, 60]
 

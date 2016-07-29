@@ -29,6 +29,9 @@ Three main modules are included:
     (2) process_sims.py -- simulates the COMPTEL neutron response
     (3) analyze_sims.py -- analyzes the simulated data
 
+This project is still under development. Please contact Morgan with any problems
+or suggestions.
+
 
     ---------------------
     Software Requirements

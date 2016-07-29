@@ -60,7 +60,7 @@ def angular_res(data):
                               data[['x_1', 'y_1', 'z_1']].values, axis=1)
 
     # calculate classical kinetic energy
-    E_n = .5 * m_n * (distance / data['TimeOfFlight'].values)
+    E_n = .5 * m_n * (distance / data['TimeOfFlight'].values)**2
 
     # measured scattered angle derived from n-p scattering kinematics
     phi_measured = arccos(sqrt(data['D1Energy'].values * eV / (E_n * kilo)))
@@ -72,8 +72,8 @@ def angular_res(data):
     theta_scttrd = arccos(c)
     phi_scttrd = 360 - arctan(b / a)
 
-    phi_geo = arccos(cos(theta_scttrd) * cos(theta_src) + sin(theta_scttrd)
-                     * sin(theta_src) * cos(phi_scttrd - phi_src))
+    phi_geo = arccos(cos(theta_scttrd) * cos(theta_src) + sin(theta_scttrd) *
+                     sin(theta_src) * cos(phi_scttrd - phi_src))
 
     if inplace:
         data['NeutronKE'] = E_n
