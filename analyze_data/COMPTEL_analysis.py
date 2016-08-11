@@ -78,8 +78,10 @@ def output_data(path_to_pickles):
         with open(pckl, 'rb') as p:
             data = pickle.load(p)
 
-        df[data.incident_energy, data.angle]
+        # identify the bin for each triggered event
+        # make a data frame with the effective area of each 'bin'
 
+        df[data.incident_energy, data.angle]
 
 
 # if __name__ == '__main__':

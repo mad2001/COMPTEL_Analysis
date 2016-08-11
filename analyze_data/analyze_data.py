@@ -27,7 +27,7 @@ def open_data(path_to_pickles):
     # plt.rc('text', usetex=True)
     # plt.rc('font', family='serif')
 
-    with open('output_data.txt', 'w') as f:
+    with open('output_test2.txt', 'w') as f:
         for E in energy:
             eff = []
             err = []

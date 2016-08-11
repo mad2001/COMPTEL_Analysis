@@ -243,16 +243,20 @@ class VetoDome1(Volume):
         # if in z range where there is no veto dome overlap return true
         elif z > 77:
             return True
-        # if in z range where there is overlap but is in x, y range retrun true
+        # if in z range where there is overlap but is in x, y range return true
         elif 73 < np.sqrt(x**2 + y**2) < 80:
             return True
         else:
             return False
 
     def check_veto(self, energy):
-        if energy > 50:
-            return True
-        else:
+        try:
+            # threshold energy is 230 keV
+            if energy > 50:
+                return True
+            else:
+                return False
+        except:
             return False
 
 
@@ -284,6 +288,7 @@ class VetoDome2(Volume):
             return False
 
     def check_veto(self, energy):
+        # threshold energy is 472 keV
         if energy > 50:
             return True
         else:
@@ -318,6 +323,7 @@ class VetoDome3(Volume):
             return False
 
     def check_veto(self, energy):
+        # threshold energy is 390 keV
         if energy > 50:
             return True
         else:
@@ -352,6 +358,7 @@ class VetoDome4(Volume):
             return False
 
     def check_veto(self, energy):
+        # threshold energy is 316 keV
         if energy > 50:
             return True
         else:

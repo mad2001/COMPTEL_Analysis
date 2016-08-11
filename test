@@ -1,15 +1,54 @@
 import os
-import re
+import sys
+import pickle
+from numpy import pi
 
-dirName = '/Users/morgan/Documents/COMPTEL/COMPTEL_data/COMPTEL30MeV_30deg/COMPTEL30MeV_30deg.inc1.id1.sim '
-fh = '/Users/morgan/Documents/COMPTEL/COMPTEL20MeV_0deg.inc1.id1.sim'
-it = os.path.basename(dirName)
+sys.path.insert(0, '/Users/morgan/summer_research/process_sim_files')
+from read_sims import Data
 
-file_name = re.search('(?<=/)[\w]+?(?=\.inc)', fh)
+test1 = '/Users/morgan/Documents/COMPTEL/processed_data1/COMPTEL30MeV_10deg'
 
-angle = re.search('[\d]{1,3}(?=deg)', it)
-print(file_name.group(0))
 
-t = [1]
+def efficiency(data):
 
-print(os.path.dirname(os.path.dirname(dirName)))
+    # COMPTEL's area
+    detector_area = 4042.1739633515281
+        # 7 D1 scintillators
+        # modeled as 16 sided polygons with an apothem of 13.47
+        # detector area comes from (13.47^2)(16)(tan(pi/16))
+
+    surrounding_sphere_radius = 250
+    start_area = pi * surrounding_sphere_radius**2
+
+    # calculate effective area of COMPTEL for neutrons
+    effective_area = start_area * (data.triggered_events / data.particle_count)
+
+    # calculate detector efficiency
+    efficiency = (effective_area / detector_area)*100
+
+    return efficiency
+
+
+def effective_area(data):
+    # COMPTEL's area
+    detector_area = 4042.1739633515281
+        # 7 D1 scintillators
+        # modeled as 16 sided polygons with an apothem of 13.47
+        # detector area comes from (13.47^2)(16)(tan(pi/16))
+
+    surrounding_sphere_radius = 250
+    start_area = pi * surrounding_sphere_radius**2
+    print(start_area)
+    # calculate effective area of COMPTEL for neutrons
+    effective_area = start_area * (data.triggered_events / data.particle_count)
+
+    return effective_area
+
+
+with open(test1, 'rb') as p:
+    data = pickle.load(p)
+
+print(efficiency(data))
+print(data.triggered_events)
+
+data.hits.to_csv('new_version.csv')

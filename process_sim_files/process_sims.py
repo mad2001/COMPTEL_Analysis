@@ -33,9 +33,13 @@ def process_file(sim_file):
     sim_data['Energy'] = sim_data.apply(tr.electron_equivalent, axis=1)
 
     sim_data = tr.create_hits(sim_data)
+
     sim_data = tr.broaden(sim_data)
+
     # hits.plot(x='x', y='y', kind='scatter')
     sim_data = tr.identify_triggers(sim_data)
+
+    data.hits = sim_data
 
     return data
 
@@ -62,23 +66,25 @@ def standard_output(sim_files):
             pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
     if os.path.isdir(sim_files):
-        out_dir = os.path.join(os.path.dirname(sim_files), 'processed_data')
+        out_dir = os.path.join(os.path.dirname(sim_files), 'processed_data2')
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
 
         for dirName, subdirList, fileList in os.walk(sim_files):
 
             filename = os.path.join(out_dir, os.path.basename(dirName))
-            if os.path.exists(filename):
-                continue
+
+            # if os.path.exists(filename):
+            #     continue
 
             sims = glob.glob(dirName + '/*.sim')
 
             if sims:
+                print('Processing {}', dirName)
                 data = process_file(sims[0])
 
                 for s in sims[1:]:
-                    data.combine(s)
+                    data.combine(process_file(s))
 
                 with open(filename, 'wb') as f:
                     pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)

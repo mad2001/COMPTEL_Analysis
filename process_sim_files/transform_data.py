@@ -32,6 +32,19 @@ d2 = [2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11,
 veto_domes = [3.1, 3.2, 3.3, 3.4]
 
 
+class Trigger_Tracker(object):
+
+    def __init__(self, type1, type2, type3):
+        self.type1 = type1
+        self.type2 = type2
+        self.type3 = type3
+
+    def output(self):
+        print('Type 1 triggers: {}'.format(self.type1))
+        print('Type 2 triggers: {}'.format(self.type2))
+        print('Type 3 triggers: {}'.format(self.type3))
+
+
 def identify_COMPTELmodule(sim_data):
     """Use hit location and detector type in order to detemine detector module.
 
@@ -94,16 +107,17 @@ def identify_COMPTELmodule(sim_data):
 def electron_equivalent(sim_data):
     """Convert the particle's kinetic energy into its electron equivalent.
 
-    Light output from O'Neill et al. and R. A. Cecil et al.,
+    Light output from R. A. Cecil et al.,
     "Improved Predictions of Neutron Detection..."
     """
-    energy = sim_data['Energy']
+    # convert energy to MeV
+    energy = sim_data['Energy'] * 0.001
     particle = sim_data['ParticleID']
     detectorID = sim_data['DetectorID']
 
     # if electron/positron
     if particle == 2 or particle == 3:
-        return energy
+        return energy * 1000
 
     # if particle is alpha or He-3
     elif particle == 21 or particle == 20:
@@ -112,9 +126,10 @@ def electron_equivalent(sim_data):
             a_2 = 5.9
             a_3 = 0.065
             a_4 = 1.01
-            return a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
+            energy = a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
+            return energy * 1000
         elif detectorID in d2:
-            return energy
+            return energy * 1000
 
     # if particle is proton, deuteron, or triton
     elif particle == 4 or particle == 18 or particle == 19:
@@ -124,18 +139,19 @@ def electron_equivalent(sim_data):
             a_2 = 2.82
             a_3 = 0.25
             a_4 = 0.93
-            return a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
+            energy = a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
+            return energy * 1000
         # if interaction is in D2 layer (NaI)
         elif detectorID in d2:
-            return energy
+            return energy * 1000
         # if interaction is in veto dome (using NE-102 instead of NE-110)
         elif detectorID in veto_domes:
             a_1 = 0.95
             a_2 = 8.0
             a_3 = 0.1
             a_4 = 0.90
-            return a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
-
+            energy = a_1 * energy - a_2 * (1.0 - np.exp(-a_3 * energy**a_4))
+            return energy * 1000
     else:
         # particle is likely heavy nucleus with neglible light output
         # or uncharged particle
@@ -145,7 +161,7 @@ def electron_equivalent(sim_data):
 def create_hits(sim_data):
     """Turn the raw sim data into 'hits'; closer to detector output."""
     # create groups of interactions occurring in the same module
-    # filter out those that deposit no energy (these would not be detected)
+    # filter out those that deposit no energy
     hits = sim_data.groupby(['EventID', 'DetectorID']).filter(
         lambda x: x['Energy'].sum() != 0)
 
@@ -206,12 +222,12 @@ def broaden(hits):
 
         Energy must be in units of MeV.
         """
-        # conver to MeV
+        # convert from keV to MeV
         energy = energy / 1000
 
         try:
             sigma = 0.01 * np.sqrt(9.86 * energy + 4.143 * energy**2)
-            return np.random.normal(energy, sigma)
+            return np.random.normal(energy, sigma) * 1000
 
         # accounts for possibility of all energy values being zero
         except ValueError:
@@ -229,7 +245,6 @@ def broaden(hits):
             hits.loc[(slice(None), DetectorID), 'y'] = group.y.apply(broaden)
             hits.loc[(slice(None), DetectorID), 'z'] = 102.35
 
-            # CHANGED THIS FROM THE FUNCTION ABOVE, HOPEFULLY DOESN'T BREAK
             broaden_d1energy = d1energy_resolution(DetectorID)
             hits.loc[(slice(None), DetectorID), 'Energy'] = group.Energy.map(
                 lambda x: broaden_d1energy(x))
@@ -263,8 +278,11 @@ def identify_triggers(hits):
     d2_min = 600
     tof_max = 40.7e-9
 
+    tracked = Trigger_Tracker(0, 0, 0,)
+
     def COMPTEL_filters(event):
         """Go through each event and determines whether or not it is a hit."""
+
         idx = event.index.get_level_values('DetectorID')
 
         # true if there is one hit in D1 and one hit in D2
@@ -273,6 +291,26 @@ def identify_triggers(hits):
         # true if energy deposited in D1 and D2 are above the energy minimums
         energy_thrshld = all(event.Energy[idx.isin(d1)] > d1_min) and all(
             event.Energy[idx.isin(d2)] > d2_min)
+
+        def veto_check(event, idx):
+            """ Determines whether or not a veto dome was triggered.
+
+            Returns True if a veto dome is trigged.
+            """
+            if not any(idx.isin(veto_domes)):
+                return False
+            elif any(idx.isin([3.1])):
+                return VD1.check_veto(event.loc[(slice(None), 3.1),
+                                                'Energy'].values)
+            elif any(idx.isin([3.2])):
+                return VD2.check_veto(event.loc[(slice(None), 3.2),
+                                                'Energy'].values)
+            elif any(idx.isin([3.3])):
+                return VD3.check_veto(event.loc[(slice(None), 3.3),
+                                                'Energy'].values)
+            elif any(idx.isin([3.4])):
+                return VD4.check_veto(event.loc[(slice(None), 3.4),
+                                                'Energy'].values)
 
         if good_path:
             # initialized here as only makes sense if there is a hit in D1 and D2
@@ -286,18 +324,14 @@ def identify_triggers(hits):
             if energy_thrshld and (0 < tof < tof_max):
                 pass
             else:
+                tracked.type2 += 1
                 return False
         else:
+            tracked.type1 += 1
             return False
 
-        # veto dome is triggered if the energy deposited is above the minimum
-        #   energy specified in the define_volumes module
-        veto1 = any(idx.isin([3.01])) and VD1.check_veto(event.Energy[3.01])
-        veto2 = any(idx.isin([3.02])) and VD2.check_veto(event.Energy[3.02])
-        veto3 = any(idx.isin([3.03])) and VD3.check_veto(event.Energy[3.03])
-        veto4 = any(idx.isin([3.04])) and VD4.check_veto(event.Energy[3.04])
-
-        if veto1 or veto2 or veto3 or veto4:
+        if veto_check(event, idx):
+            tracked.type3 += 1
             return False
         else:
             return True
@@ -310,6 +344,7 @@ def identify_triggers(hits):
     # this works but is a bad way to handle time of flight
     # need to calculate and broaden same time as other values
     tof = d2_data['ElapsedTime'].sub(d1_data['ElapsedTime'].values)
+    tracked.output()
 
     return pd.DataFrame({'D1Energy': d1_data.Energy.values,
                          'x_1': d1_data.x.values,

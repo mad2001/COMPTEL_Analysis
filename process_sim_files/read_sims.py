@@ -23,13 +23,16 @@ class Data:
         self.particle_count = particle_count
         self.incident_energy = incident_energy
         self.angle = angle
-        self.triggered_events = len(self.hits.index)
-        # normal vector from point in D1 to point in D2
-        self.path_length = np.linalg.norm(self.hits[['x_2', 'y_2', 'z_2']].values -
-                                  self.hits[['x_1', 'y_1', 'z_1']].values,
-                                  axis=1)
+
+    @property
+    def triggered_events(self):
+        return len(self.hits.index)
 
     def measured_energy(self):
+        # normal vector from point in D1 to point in D2
+        path_length = np.linalg.norm(self.hits[['x_2', 'y_2', 'z_2']].values -
+                                     self.hits[['x_1', 'y_1', 'z_1']].values,
+                                     axis=1)
 
         # calculate classical kinetic energy in joules
         E_n = .5 * m_n * (self.path_length / self.hits['TimeOfFlight'].values)**2
@@ -41,6 +44,10 @@ class Data:
 
 
     def measured_angle(self):
+        # normal vector from point in D1 to point in D2
+        path_length = np.linalg.norm(self.hits[['x_2', 'y_2', 'z_2']].values -
+                                  self.hits[['x_1', 'y_1', 'z_1']].values,
+                                  axis=1)
 
         # calculate classical kinetic energy in joules
         E_n = .5 * m_n * (self.path_length / self.hits['TimeOfFlight'].values)**2
